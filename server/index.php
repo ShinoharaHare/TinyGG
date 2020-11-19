@@ -1,6 +1,14 @@
 <?php
-$a = explode('/', $_SERVER['REQUEST_URI']);
+$args = explode('/', $_SERVER['REQUEST_URI']);
 
-print_r($a);
-header('Location: //' . $a[1] . '.com');
-exit();
+print_r($args);
+
+if ($args[1] == '') {
+    redirect('public');
+}
+
+function redirect($url)
+{
+    header('Location: ' . $url);
+    exit();
+}

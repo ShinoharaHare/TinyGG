@@ -7,19 +7,26 @@ const routes: Array<RouteConfig> = [
     {
         path: '/',
         name: 'Home',
+        meta: { title: 'Shorten | TinyGG' },
         component: () => import('@/views/Home.vue')
     },
     {
         path: '/manage',
         name: 'Manage',
+        meta: { title: 'Manage | TinyGG' },
         component: () => import('@/views/Manage.vue')
     }
 ]
 
 const router = new VueRouter({
-    mode: 'history',
+    mode: 'hash',
     base: process.env.BASE_URL,
     routes
+})
+
+router.beforeEach((to, from, next) => {
+    document.title = to.meta.title
+    next()
 })
 
 export default router
