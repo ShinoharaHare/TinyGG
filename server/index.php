@@ -1,14 +1,11 @@
 <?php
-$args = explode('/', $_SERVER['REQUEST_URI']);
+require_once('./utils.php');
 
-print_r($args);
+$key = explode('/', $_SERVER['REQUEST_URI'])[1];
 
-if ($args[1] == '') {
+if (empty($key)) {
     redirect('public');
-}
-
-function redirect($url)
-{
-    header('Location: ' . $url);
-    exit();
+} else {
+    // 從Shortened找到對應的original並redirect
+    // redirect();
 }
