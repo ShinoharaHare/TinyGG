@@ -1,5 +1,7 @@
 {
     "name": "dbmaster/tinygg",
     "type": "project",
-    "require": {}
+    "require": {
+        "php": "^7.4.0"
+    }
 }
