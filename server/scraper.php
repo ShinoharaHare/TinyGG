@@ -4,18 +4,47 @@ require_once('./utils.php');
 
 function scrape($url)
 {
-    $html = file_get_html($url);
+    $dom = file_get_html($url);
+
     $data = [];
-    $data['title'] = $html->find('title', 0)->plaintext;
-    $data['favicon'] = urljoin($url, 'favicon.ico');
-    $data['summary'] = $html->find('meta[name="description"]', 0)->content;
-    $tmp = $html->find('link[rel="image_src"]', 0)->href;
-    $data['cover'] = urljoin($url, $tmp);
-    if (empty($data['cover'])) {
-        $tmp = $html->find('img[src]', 0)->src;
-        $data['cover'] = urljoin($url, $tmp);
-    }
+
+    $data['title'] = extractData($dom, array(
+        array('meta[property="og:title"]', 'content'),
+        array('title', 'plaintext'),
+        array('meta[property="og:site_name"]', 'content')
+    ));
+
+    $data['summary'] = extractData($dom, array(
+        array('meta[name="description"]', 'content'),
+        array('meta[property="og:description"]', 'content'),
+        array('meta[property="og:site_name"]', 'content')
+    ));
+
+    $data['favicon'] = urljoin($url, extractData($dom, array(
+        array('link[rel="icon"]', 'href'),
+        array('link[rel="shortcut icon"]', 'href')
+    ), 'favicon.ico'));
+
+    $data['cover'] = urljoin($url, extractData($dom, array(
+        array('link[rel="image_src"]', 'href'),
+        array('meta[property="og:image"]', 'content'),
+        array('img[src]', 'src')
+    )));
+
     return $data;
+}
+
+function extractData($dom, $selectors, $default=null)
+{
+    foreach ($selectors as $s) {
+        $query = $s[0];
+        $attr = $s[1];
+        $val = $dom->find($query, 0)->$attr;
+        if (!empty($val)) {
+            return $val;
+        }
+    }
+    return $default;
 }
 
 $data = scrape($_GET['url']);
