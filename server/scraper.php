@@ -1,10 +1,14 @@
 <?php
-require_once('./simple_html_dom.php');
-require_once('./utils.php');
+require_once './vendor/autoload.php';
+require_once './utils.php';
+
+
+use voku\helper\HtmlDomParser;
+
 
 function scrape($url)
 {
-    $dom = file_get_html($url);
+    $dom = HtmlDomParser::file_get_html($url);
 
     $data = [];
 
@@ -25,7 +29,7 @@ function scrape($url)
         array('link[rel="shortcut icon"]', 'href')
     ), 'favicon.ico'));
 
-    $data['cover'] = urljoin($url, extractData($dom, array(
+    $data['thumbnail'] = urljoin($url, extractData($dom, array(
         array('link[rel="image_src"]', 'href'),
         array('meta[property="og:image"]', 'content'),
         array('img[src]', 'src')
@@ -34,14 +38,14 @@ function scrape($url)
     return $data;
 }
 
-function extractData($dom, $selectors, $default=null)
+function extractData($dom, $selectors, $default = null)
 {
     foreach ($selectors as $s) {
         $query = $s[0];
         $attr = $s[1];
-        $val = $dom->find($query, 0)->$attr;
-        if (!empty($val)) {
-            return $val;
+        $el = $dom->find($query, 0);
+        if (!empty($el) && !empty($el->$attr)) {
+            return $el->$attr;
         }
     }
     return $default;

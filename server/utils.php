@@ -3,7 +3,17 @@
 function readJSON()
 {
     $str = file_get_contents('php://input');
-    return json_decode($str, true);
+    $data = json_decode($str, true);
+    return $data;
+}
+
+function checkFileds($data, $fields) {
+    foreach ($fields as $f) {
+        if (!isset($data[$f])) {
+            return false;
+        }
+    }
+    return true;
 }
 
 function sendJSON($obj)
@@ -16,10 +26,6 @@ function redirect($url)
 {
     header("Location: $url");
     exit();
-}
-
-function checkFields($fields)
-{
 }
 
 function urljoin($base, $rel)
