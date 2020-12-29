@@ -7,7 +7,7 @@ const routes: Array<RouteConfig> = [
     {
         path: '/',
         name: 'Home',
-        meta: { title: 'Shorten | TinyGG' },
+        meta: { title: 'Home | TinyGG' },
         component: () => import('@/views/Home.vue')
     },
     {

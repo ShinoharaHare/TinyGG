@@ -1,5 +1,5 @@
 {
-  "name": "client",
+  "name": "tinygg-client",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,6 +10,7 @@
     "@mdi/font": "^3.6.95",
     "axios": "^0.21.0",
     "core-js": "^3.6.5",
+    "generate-password": "^1.5.1",
     "roboto-fontface": "*",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
@@ -19,6 +20,7 @@
     "vuex": "^3.4.0"
   },
   "devDependencies": {
+    "@types/generate-password": "^1.5.1",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-router": "~4.5.0",
     "@vue/cli-plugin-typescript": "~4.5.0",
