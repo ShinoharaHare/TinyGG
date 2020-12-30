@@ -1,5 +1,10 @@
 <template lang="pug">
-v-dialog(max-width="300", :value="value", @input="$emit('input', $event)")
+v-dialog(
+    max-width="300",
+    :value="value",
+    :retain-focus="false",
+    @input="$emit('input', $event)"
+)
     v-card
         v-card-title 
             v-icon.mr-2(color="error") mdi-alert-circle-outline
