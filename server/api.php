@@ -17,7 +17,7 @@ $api->post('/shortened', function () {
     $key = $data["key"];
 
     // Check key
-    DAO::query("SELECT * FROM `shortened` WHERE `key` = '$key'");
+    DAO::query("SELECT * FROM `Shortened` WHERE `key` = '$key'");
 
     if(!empty(DAO::getResult())){ // key is repeated
         http_response_code(409);
@@ -30,6 +30,7 @@ $api->post('/shortened', function () {
     $summary = $data["summary"];
     $cover = $data["thumbnail"];
 
+    echo insertBriefQuery($url , $title , $favicon , $summary , $cover);
     DAO::query(insertBriefQuery($url , $title , $favicon , $summary , $cover));
 
     DAO::query(findBriefIDQuery($url)); // find the brief which just inserted;
@@ -56,19 +57,6 @@ $api->post('/shortened', function () {
     }
 });
 
-$api->get('/shortened/:key', function ($key) {    
-    $obj = getShortened($key);
-
-    if(!$obj){ // $obj = NULL
-        http_response_code(404);
-    }
-    else{
-        http_response_code(200);
-    }
-
-    sendJSON($obj);
-});
-
 $api->get('/shortened', function () {
     $ip = getIP();
     DAO::query("SELECT `ID` FROM `Creator` WHERE `IP` = '$ip';");
@@ -81,13 +69,36 @@ $api->get('/shortened', function () {
     
     $creatorID = $result[0]['ID'];
 
-    DAO::query("SELECT `key` FROM `Shortened` WHERE `creator` = '$creatorID'");
+    DAO::query("SELECT `key` FROM `Shortened` WHERE `Creator` = '$creatorID'");
     $result = DAO::getResult();
     $arr = array();
     foreach ($result as $item) {
         array_push($arr, getShortened($item['key']));
     }
     sendJSON($arr);
+});
+
+$api->get('/shortened/all', function () {
+    DAO::query("SELECT `key` FROM `Shortened`;");
+    $result = DAO::getResult();
+    $arr = array();
+    foreach ($result as $item) {
+        array_push($arr, getShortened($item['key']));
+    }
+    sendJSON($arr);
+});
+
+$api->get('/shortened/:key', function ($key) {    
+    $obj = getShortened($key);
+
+    if(!$obj){ // $obj = NULL
+        http_response_code(404);
+    }
+    else{
+        http_response_code(200);
+    }
+
+    sendJSON($obj);
 });
 
 $api->put('/shortened/:key', function ($key) {
@@ -179,7 +190,7 @@ $api->delete('/shortened/:key', function ($key) {
 
 function getShortened($key){
     // find shortened
-    DAO::query("SELECT * FROM `shortened` WHERE `key` = '$key'"); 
+    DAO::query("SELECT * FROM `Shortened` WHERE `key` = '$key'"); 
     $Shortened = DAO::getResult();
 
     if(empty($Shortened)){
@@ -190,11 +201,11 @@ function getShortened($key){
     $CreatorID = $Shortened[0]['creator'];
     
     // find brief
-    DAO::query("SELECT * FROM `brief` WHERE `ID` = '$BriefID'");
+    DAO::query("SELECT * FROM `Brief` WHERE `ID` = '$BriefID'");
     $Brief = DAO::getResult()[0];
 
     // find creator
-    DAO::query("SELECT * FROM `creator` WHERE `ID` = '$CreatorID'"); 
+    DAO::query("SELECT * FROM `Creator` WHERE `ID` = '$CreatorID'"); 
     $Creator = DAO::getResult()[0];
     
     $obj = array("key" => $key , "original" => $Brief , "creator" => $Creator);

@@ -1,5 +1,5 @@
 <template lang="pug">
-v-data-table(:headers="headers", :items="items")
+v-data-table(:headers="headers", :items="items", :loading="loading")
     template(#item.original="{ item }")
         v-tooltip(top)
             template(#activator="{ on, attrs }")
@@ -48,11 +48,13 @@ import { sendMessage } from '@/sysmsg'
 import DeleteDialog from '@/components/DeleteDialog.vue'
 
 
-
 @Component({ components: { DeleteDialog } })
 export default class extends Vue {
     @Prop({ default: () => [] })
     items!: any[]
+
+    @Prop({ default: false })
+    loading!: boolean
 
     dialog = false
     selected: any = {}

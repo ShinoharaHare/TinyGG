@@ -5,7 +5,7 @@
 function insertCreatorQuery($IP){
     $IP = $IP? "'$IP'":'NULL'; // if $IP return '$IP' else return 'NULL'
 
-    $sqlQuery = "INSERT INTO `creator` VALUES(NULL , $IP);";
+    $sqlQuery = "INSERT INTO `Creator` VALUES(NULL , $IP);";
 
     return $sqlQuery;
 }
@@ -13,7 +13,7 @@ function insertCreatorQuery($IP){
 function findCreatorIDQuery($IP){
     $IP = $IP ? "'$IP'" :'NULL'; // if $IP return '$IP' else return 'NULL'
 
-    $sqlQuery = "SELECT `ID` FROM `creator` WHERE `IP` = $IP";
+    $sqlQuery = "SELECT `ID` FROM `Creator` WHERE `IP` = $IP";
 
     return $sqlQuery;
 }
@@ -25,24 +25,24 @@ function insertBriefQuery($url , $title , $favicon , $summary , $cover){
     $summary = $summary? "'$summary'":'NULL';
     $cover   = $cover?   "'$cover'":  'NULL';
 
-    $sqlQuery = "INSERT INTO `brief` VALUES(NULL , '$url' , $title , $favicon , $summary , $cover);";
+    $sqlQuery = "INSERT INTO `Brief` VALUES(NULL , '$url' , $title , $favicon , $summary , $cover);";
 
     return $sqlQuery;
 }
 
 function findBriefIDQuery($url){
-    $sqlQuery = "SELECT `ID` FROM `brief` WHERE `url` = '$url'";
+    $sqlQuery = "SELECT `ID` FROM `Brief` WHERE `url` = '$url'";
 
     return $sqlQuery;
 }
 
 // Shortened
-function insertShortenedQuery($key , $BriefID , $creatorID){
-    if(!(isset($key) && isset($BriefID) && isset($creatorID))){
+function insertShortenedQuery($key , $BriefID , $CreatorID){
+    if(!(isset($key) && isset($BriefID) && isset($CreatorID))){
         die("insertShortenedQuery(): parameters shout BE NOT NULL!!!");
     }
 
-    $sqlQuery = "INSERT INTO `shortened` VALUES('$key' , $BriefID , $creatorID);";
+    $sqlQuery = "INSERT INTO `Shortened` VALUES('$key' , $BriefID , $CreatorID);";
 
     return $sqlQuery;
 }
@@ -52,6 +52,6 @@ function getLastID(){
 }
 
 function testQuery(){
-    return "select count(*) from creator;";
+    return "select count(*) from Creator;";
 }
 ?>

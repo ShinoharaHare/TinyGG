@@ -3,7 +3,7 @@
 class DAO {
     private static $connection;
     private static $status = array("error" => "no connection",
-                                   "result" => false);
+                                   "sqlResult" => false);
     private function __construct(){
         echo "__construct";
         // self::connect();

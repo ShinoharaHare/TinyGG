@@ -26,13 +26,13 @@
                 outlined,
                 color="success",
                 :disabled="!valid",
-                :loading="loading",
+                :loading="shortening",
                 @click="shorten"
             ) Shorten
             v-spacer
 
     v-card.mt-2.pa-4
-        DataTable(:items="items", @update="items = $event")
+        DataTable(:items="items", :loading="loading" @update="items = $event")
 </template>
 
 <script lang="ts">
@@ -58,7 +58,9 @@ export default class extends Vue {
     key = ''
     original = ''
 
-    loading = false;
+    loading = false
+
+    shortening = false
 
 
     get prefix() {
@@ -82,13 +84,13 @@ export default class extends Vue {
     }
 
     async shorten() {
-        this.loading = true
+        this.shortening = true
         let { status, data } = await axios.post('/api/shortened', {
             key: this.key,
             original: this.original
         })
 
-        this.loading = false
+        this.shortening = false
 
         switch (status) {
             case 201:
@@ -103,7 +105,9 @@ export default class extends Vue {
     }
 
     async getData() {
+        this.loading = true
         let { status, data } = await axios.get('/api/shortened')
+        this.loading = false
 
         switch (status) {
             case 200:
