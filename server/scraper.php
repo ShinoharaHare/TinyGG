@@ -8,7 +8,17 @@ use voku\helper\HtmlDomParser;
 
 function scrape($url)
 {
-    $dom = HtmlDomParser::file_get_html($url);
+    error_reporting(E_ERROR | E_PARSE);
+    try {
+        $dom = HtmlDomParser::file_get_html($url);
+    } catch (Exception $e)  {
+        return [
+            'title' => null,
+            'summary' => null,
+            'favicon' => null,
+            'thumbnail' => null,
+        ];
+    }
 
     $data = [];
 
