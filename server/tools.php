@@ -10,8 +10,8 @@ function insertCreatorQuery($IP){
     return $sqlQuery;
 }
 
-function findCreatorIDQuery($IPv4 , $IPv6){
-    $IPv = $IP? "'$IP'":'NULL'; // if $IP return '$IP' else return 'NULL'
+function findCreatorIDQuery($IP){
+    $IP = $IP ? "'$IP'" :'NULL'; // if $IP return '$IP' else return 'NULL'
 
     $sqlQuery = "SELECT `ID` FROM `creator` WHERE `IP` = $IP";
 

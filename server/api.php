@@ -11,9 +11,10 @@ $api->get('/', function () {
 
 // 新建短網址
 $api->post('/shortened', function () {
-    $IP = $_SERVER['REMOTE_ADDR'];
-    $url = $_POST["original"];
-    $key = $_POST["key"];
+    $data = readJSON();
+    $IP = getIP();
+    $url = $data["original"];
+    $key = $data["key"];
 
     // Check key
     DAO::query("SELECT * FROM `shortened` WHERE `key` = '$key'");
@@ -23,19 +24,13 @@ $api->post('/shortened', function () {
         return;
     }
 
-    // Check Brief
-    DAO::query(findBriefIDQuery($url)); // find Brief ID
-    $BriefID = DAO::getResult();
-    
-    if($BriefID == NULL){ // Brief doesn't exist
-        $data = scrape($url);
-        $title = $data["title"];
-        $favicon = $data["favicon"];
-        $summary = $data["summary"];
-        $cover = $data["thumbnail"];
+    $data = scrape($url);
+    $title = $data["title"];
+    $favicon = $data["favicon"];
+    $summary = $data["summary"];
+    $cover = $data["thumbnail"];
 
-        DAO::query(insertBriefQuery($url , $title , $favicon , $summary , $cover)); // add the new brief   
-    }
+    DAO::query(insertBriefQuery($url , $title , $favicon , $summary , $cover));
 
     DAO::query(findBriefIDQuery($url)); // find the brief which just inserted;
     $BriefID = (int)DAO::getResult()[0]["ID"]; // string => integer
@@ -59,6 +54,40 @@ $api->post('/shortened', function () {
         sendJSON($obj);
         http_response_code(201);
     }
+});
+
+$api->get('/shortened/:key', function ($key) {    
+    $obj = getShortened($key);
+
+    if(!$obj){ // $obj = NULL
+        http_response_code(404);
+    }
+    else{
+        http_response_code(200);
+    }
+
+    sendJSON($obj);
+});
+
+$api->get('/shortened', function () {
+    $ip = getIP();
+    DAO::query("SELECT `ID` FROM `Creator` WHERE `IP` = '$ip';");
+    $result = DAO::getResult();
+    
+    if (empty($result)) {
+        sendJSON(array());
+        return;
+    } 
+    
+    $creatorID = $result[0]['ID'];
+
+    DAO::query("SELECT `key` FROM `Shortened` WHERE `creator` = '$creatorID'");
+    $result = DAO::getResult();
+    $arr = array();
+    foreach ($result as $item) {
+        array_push($arr, getShortened($item['key']));
+    }
+    sendJSON($arr);
 });
 
 $api->put('/shortened/:key', function ($key) {
@@ -135,7 +164,7 @@ $api->delete('/shortened/:key', function ($key) {
 
     if (empty($result)) {
         http_response_code(404);
-        exit;
+        return;
     } else {
         $briefID = $result[0]['original'];
 
@@ -144,10 +173,6 @@ $api->delete('/shortened/:key', function ($key) {
 
         http_response_code(204);
     }
-});
-
-$api->get('/shortened/search', function () {
-    
 });
 
 // $api->post('/shortened/:key/', function ($key) {

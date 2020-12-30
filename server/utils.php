@@ -1,5 +1,9 @@
 <?php
 
+function getIP() {
+    return $_SERVER['REMOTE_ADDR'];
+}
+
 function readJSON()
 {
     $str = file_get_contents('php://input');
