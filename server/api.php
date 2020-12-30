@@ -105,12 +105,11 @@ $api->put('/shortened/:key', function ($key) {
     $target = DAO::getResult()[0];
 
     $creatorID = $target['creator'];
-    $newIPv4 = $data['creator']['IPv4'];
-    $newIPv6 = $data['creator']['IPv6'];
-    DAO::query("UPDATE creator SET `IPv4`='$newIPv4', `IPv6`='$newIPv6' WHERE `ID`=$creatorID;");
+    $newIP = $data['creator']['IP'];
+    DAO::query("UPDATE creator SET `IP`='$newIP' WHERE `ID`=$creatorID;");
     if(DAO::getError()){  // error
         // echo 1;
-        http_response_code(500);/////////////////////////
+        http_response_code(500);
         return ;
     }
 
@@ -123,7 +122,7 @@ $api->put('/shortened/:key', function ($key) {
     DAO::query("UPDATE brief SET `url`='$newUrl', `title`='$newTitle', `favicon`='$newFavicon', `summary`='$newSummary', `cover`='$newCover' WHERE `ID`=$briefID;");
     if(DAO::getError()){  // error
         // echo 2;
-        http_response_code(500);/////////////////////////
+        http_response_code(500);
         return ;
     }
 
@@ -132,7 +131,7 @@ $api->put('/shortened/:key', function ($key) {
     DAO::query("UPDATE shortened SET `key`='$newKey' WHERE `key`='$shortenedKey';");
     if(DAO::getError()){  // error
         // echo 3;
-        http_response_code(409);/////////////////////////
+        http_response_code(409);
         return ;
     }
     
@@ -151,8 +150,7 @@ $api->put('/shortened/:key', function ($key) {
                     ),
                     'creator' => array(
                         'ID' => $newData['ID'],
-                        'IPv4' => $newData['IPv4'],
-                        'IPv6' => $newData['IPv6']
+                        'IP' => $newData['IP']
                     ));
     sendJSON($JSON);
     http_response_code(200);
