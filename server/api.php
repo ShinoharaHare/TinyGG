@@ -10,10 +10,8 @@ $api->get('/', function () {
 });
 
 // 新建短網址
-$api->get('/shortened', function () {
-    $IPv4 = $_SERVER['REMOTE_ADDR'];
-    $IPv6 = "Iv666";
-    echo $IPv4;
+$api->post('/shortened', function () {
+    $IP = $_SERVER['REMOTE_ADDR'];
     $url = $_POST["original"];
     $key = $_POST["key"];
 
@@ -43,14 +41,14 @@ $api->get('/shortened', function () {
     $BriefID = (int)DAO::getResult()[0]["ID"]; // string => integer
 
     // Check Creator
-    DAO::query(findCreatorIDQuery($IPv4 , $IPv6)); // find creator ID
+    DAO::query(findCreatorIDQuery($IP)); // find creator ID
     $CreatorID = DAO::getResult();
 
     if($CreatorID == NULL){ // Creator doesn't exist
-        DAO::query(insertCreatorQuery($IPv4 , $IPv6)); // add the new creator
+        DAO::query(insertCreatorQuery($IP)); // add the new creator
     }
 
-    DAO::query(findCreatorIDQuery($IPv4 , $IPv6)); // find the creator which just inserted;
+    DAO::query(findCreatorIDQuery($IP)); // find the creator which just inserted;
     $CreatorID = (int)DAO::getResult()[0]["ID"]; // string => integer
 
     // Insert Shortened

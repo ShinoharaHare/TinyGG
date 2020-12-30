@@ -2,20 +2,18 @@
 // tools.php
 
 // Creator
-function insertCreatorQuery($IPv4 , $IPv6){
-    $IPv4 = $IPv4? "'$IPv4'":'NULL'; // if $IPv4 return '$IPv4' else return 'NULL'
-    $IPv6 = $IPv6? "'$IPv6'":'NULL';
+function insertCreatorQuery($IP){
+    $IP = $IP? "'$IP'":'NULL'; // if $IP return '$IP' else return 'NULL'
 
-    $sqlQuery = "INSERT INTO `creator` VALUES(NULL , $IPv4 , $IPv6);";
+    $sqlQuery = "INSERT INTO `creator` VALUES(NULL , $IP);";
 
     return $sqlQuery;
 }
 
 function findCreatorIDQuery($IPv4 , $IPv6){
-    $IPv4 = $IPv4? "'$IPv4'":'NULL'; // if $IPv4 return '$IPv4' else return 'NULL'
-    $IPv6 = $IPv6? "'$IPv6'":'NULL';
+    $IPv = $IP? "'$IP'":'NULL'; // if $IP return '$IP' else return 'NULL'
 
-    $sqlQuery = "SELECT `ID` FROM `creator` WHERE `IPv4` = $IPv4 AND `IPv6` = $IPv6";
+    $sqlQuery = "SELECT `ID` FROM `creator` WHERE `IP` = $IP";
 
     return $sqlQuery;
 }
