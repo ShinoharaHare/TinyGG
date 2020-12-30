@@ -32,7 +32,6 @@ $api->post('/shortened', function () {
     $summary = $data["summary"];
     $cover = $data["thumbnail"];
 
-    echo insertBriefQuery($url , $title , $favicon , $summary , $cover);
     DAO::query(insertBriefQuery($url , $title , $favicon , $summary , $cover));
 
     DAO::query(findBriefIDQuery($url)); // find the brief which just inserted;
