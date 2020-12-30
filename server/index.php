@@ -8,7 +8,7 @@ require_once './utils.php';
 require_once './api.php';
 
 
-DAO::connect("localhost", "root", "", "TinyGG");
+DAO::connect("localhost", "root", "wayne1224", "test");
 
 $router = new Router;
 
@@ -30,6 +30,7 @@ $router->add('/test', function () {
 
     return 'TEST' . "<br />";
 });
+
 
 // $router->post('/create', function(){
 //     $key = isset($_POST['key']) ? $_POST['key'] : 'none';
