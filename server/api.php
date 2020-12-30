@@ -10,7 +10,7 @@ $api->get('/', function () {
 });
 
 // 新建短網址
-$api->get('/shortened', function () {
+$api->post('/shortened', function () {
     $IPv4 = "Iv444";
     $IPv6 = "Iv666";
     $url = "https://www.youtube.com/watch?v=G0o4JUNSeLw&ab_channel=ASMRBakery";
@@ -75,15 +75,28 @@ $api->get('/shortened/:key', function ($key) {
     sendJSON($obj);
 });
 
-// $api->put('/shortened/:key', function ($id) {
+$api->delete('/shortened/:key', function ($key) {
+    DAO::query("SELECT original FROM Shortened WHERE `key` = '$key';");
+    $result = DAO::getResult();
 
-// });
+    if (empty($result)) {
+        http_response_code(404);
+        exit;
+    } else {
+        $briefID = $result[0]['original'];
 
-// $api->delete('/shortened/:key', function ($id) {
+        DAO::query("DELETE FROM Shortened WHERE `key` = '$key';");
+        DAO::query("DELETE FROM Brief WHERE `ID` = '$briefID';");
 
-// });
+        http_response_code(204);
+    }
+});
 
-// $api->post('/shortened/:id/', function ($id) {
+$api->get('/shortened/search', function () {
+    
+});
+
+// $api->post('/shortened/:key/', function ($key) {
 
 // });
 
