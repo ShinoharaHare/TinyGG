@@ -7,15 +7,19 @@ v-app(dark)
                 v-tab(to="/manage") Manage
 
     v-main.align-center
-        v-scale-transition(mode="out-in" )
+        v-scale-transition(mode="out-in")
             router-view
+
+    SystemMessage
 </template>
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator'
-import { Route } from 'vue-router';
 
-@Component
+import SystemMessage from '@/components/SystemMessage.vue'
+
+
+@Component({ components: { SystemMessage } })
 export default class extends Vue {
 }
 </script>
