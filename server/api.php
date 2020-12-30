@@ -13,18 +13,18 @@ $api->post('/shortened', function () {
 
 });
 
-$api->get('/shortened/:id', function ($id) {
+$api->get('/shortened/:key', function ($key) {
 
 });
 
-$api->put('/shortened/:id', function ($id) {
+$api->put('/shortened/:key', function ($key) {
 
 });
 
-$api->delete('/shortened/:id', function ($id) {
+$api->delete('/shortened/:key', function ($key) {
 
 });
 
-// $api->post('/shortened/:id/', function ($id) {
+// $api->post('/shortened/:key/', function ($key) {
 
 // });

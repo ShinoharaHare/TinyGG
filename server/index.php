@@ -8,7 +8,7 @@ require_once './utils.php';
 require_once './api.php';
 
 
-DAO::connect("localhost", "root", "", "TinyGG");
+DAO::connect('klbcedmmqp7w17ik.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306', 'mvluewsqu2srlrlf', 'pe79kuupmu8j5xr9', '');
 
 $router = new Router;
 
