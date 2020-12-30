@@ -42,7 +42,7 @@ v-data-table(:headers="headers", :items="items", :loading="loading")
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator'
-import { decodeHTMLEntities } from '@/utils'
+import { decodeHTMLEntities, copyToClipboard } from '@/utils'
 import { sendMessage } from '@/sysmsg'
 
 import DeleteDialog from '@/components/DeleteDialog.vue'
@@ -73,7 +73,8 @@ export default class extends Vue {
 
     copy(key: string) {
         let text = `${location.protocol}//${location.host}/${key}`
-        navigator.clipboard.writeText(text)
+        // navigator.clipboard.writeText(text)
+        copyToClipboard(text)
         sendMessage('Shortened URL copied!')
     }
 
