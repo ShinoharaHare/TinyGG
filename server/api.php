@@ -10,11 +10,12 @@ $api->get('/', function () {
 });
 
 // 新建短網址
-$api->post('/shortened', function () {
-    $IPv4 = "Iv444";
+$api->get('/shortened', function () {
+    $IPv4 = $_SERVER['REMOTE_ADDR'];
     $IPv6 = "Iv666";
-    $url = "https://www.youtube.com/watch?v=G0o4JUNSeLw&ab_channel=ASMRBakery";
-    $key = "822";
+    echo $IPv4;
+    $url = $_POST["original"];
+    $key = $_POST["key"];
 
     // Check key
     DAO::query("SELECT * FROM `shortened` WHERE `key` = '$key'");
