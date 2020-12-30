@@ -47,7 +47,7 @@ $r = $router->dispatch(isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '/
 if ($r) {
     echo $r();
 } else {
-    die('Page not found');
+    print('Page not found');
 }
 DAO::disconnect();
 

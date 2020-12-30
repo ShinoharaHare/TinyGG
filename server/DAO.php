@@ -40,13 +40,15 @@ class DAO {
     }
     
     public static function getResult(){
-        return self::$status["result"];
+        return self::$status["sqlResult"];
+    }
+
+    public static function getError(){
+        return self::$status["error"];
     }
 
     public static function setError($errorMsg){
-        if($errorMsg){
-            self::$status["error"] = $errorMsg;
-        }
+        self::$status["error"] = $errorMsg;
     }
 
     public static function query($sqlQuery){
@@ -55,13 +57,14 @@ class DAO {
                 // print_r($result);
                 if($result !== true){
                     $rows = [];
-                    while($row = $result->fetch_array()){
+                    while($row = $result->fetch_assoc()){
                         $rows[] = $row;
                     }
                     $result->close();
                     $result = $rows;
                 }
-                self::$status["result"] = $result;
+                self::$status["sqlResult"] = $result;
+                self::setError(false);
             }else{
                 self::setError("SQL execution fail!!");
             }
