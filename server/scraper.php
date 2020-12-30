@@ -50,6 +50,3 @@ function extractData($dom, $selectors, $default = null)
     }
     return $default;
 }
-
-$data = scrape($_GET['url']);
-sendJSON($data);

@@ -1,25 +1,50 @@
 <?php
 // tools.php
-function insertCreatorQuery($IPv4, $IPv6){
-    $IPv4 = $IPv4? "'$IPv4'":'NULL';
-    $IPv6 = $IPv6? "'$IPv6'":'NULL';
-    $sqlQuery = "INSERT INTO `Creator` VALUES(NULL, $IPv4, $IPv6);";
+
+// Creator
+function insertCreatorQuery($IP){
+    $IP = $IP? "'$IP'":'NULL'; // if $IP return '$IP' else return 'NULL'
+
+    $sqlQuery = "INSERT INTO `creator` VALUES(NULL , $IP);";
+
     return $sqlQuery;
 }
 
-function insertBriefQuery($url, $title, $favicon, $summary, $cover){
+function findCreatorIDQuery($IPv4 , $IPv6){
+    $IPv = $IP? "'$IP'":'NULL'; // if $IP return '$IP' else return 'NULL'
+
+    $sqlQuery = "SELECT `ID` FROM `creator` WHERE `IP` = $IP";
+
+    return $sqlQuery;
+}
+
+// Brief
+function insertBriefQuery($url , $title , $favicon , $summary , $cover){
     $title   = $title?   "'$title'":  'NULL';
     $favicon = $favicon? "'$favicon'":'NULL';
     $summary = $summary? "'$summary'":'NULL';
     $cover   = $cover?   "'$cover'":  'NULL';
-    return "INSERT INTO `Brief` VALUES(NULL, '$url', $title, $favicon, $summary, $cover);";
+
+    $sqlQuery = "INSERT INTO `brief` VALUES(NULL , '$url' , $title , $favicon , $summary , $cover);";
+
+    return $sqlQuery;
 }
 
-function insertShortenedQuery($key, $originalID, $creatorID){
-    if(!(isset($key)&&isset($originalID)&&isset($creatorID))){
+function findBriefIDQuery($url){
+    $sqlQuery = "SELECT `ID` FROM `brief` WHERE `url` = '$url'";
+
+    return $sqlQuery;
+}
+
+// Shortened
+function insertShortenedQuery($key , $BriefID , $creatorID){
+    if(!(isset($key) && isset($BriefID) && isset($creatorID))){
         die("insertShortenedQuery(): parameters shout BE NOT NULL!!!");
     }
-    return "INSERT INTO `` VALUES('$key', $originalID, $creatorID);";
+
+    $sqlQuery = "INSERT INTO `shortened` VALUES('$key' , $BriefID , $creatorID);";
+
+    return $sqlQuery;
 }
 
 function getLastID(){
