@@ -3,43 +3,59 @@ v-data-table(:headers="headers", :items="items")
     template(#item.original="{ item }")
         v-tooltip(top)
             template(#activator="{ on, attrs }")
-                a(
+                a.ellipsis(
+                    style="max-width: 200px",
                     target="_blank",
-                    :href="item.original",
+                    :href="item.original.url",
                     v-bind="attrs",
                     v-on="on"
-                ) {{ item.original }}
+                ) {{ item.original.url }}
             span
-                v-img(:src="item.thumbnail", max-width="350")
+                v-img(:src="item.original.cover", max-width="350")
 
     template(#item.title="{ item }")
-        v-tooltip(top)
+        v-tooltip(top, max-width="300")
             template(#activator="{ on, attrs }")
-                span(v-bind="attrs", v-on="on") {{ item.title }}
-            span {{ item.summary }}
+                span.ellipsis(
+                    style="max-width: 100px",
+                    v-bind="attrs",
+                    v-on="on"
+                ) {{ decode(item.original.title) }}
+            span
+                span {{ decode(item.original.title) }}
+                v-divider.my-1.white
+                span {{ decode(item.original.summary) }}
 
     template(#item.favicon="{ item }")
         v-tooltip(top)
             template(#activator="{ on, attrs }")
                 v-avatar(size="24", v-bind="attrs", v-on="on")
-                    v-img(:src="item.favicon")
-            span {{ item.favicon }}
+                    v-img(:src="item.original.favicon")
+            span {{ item.original.favicon }}
 
     template(#item.actions="{ item }")
-        v-icon.mr-2(color="primary", @click="copy(item.key)") mdi-content-copy
+        v-icon(color="primary", @click="copy(item.key)") mdi-clipboard-text-multiple-outline
+        v-icon.ml-2(color="error", @click="showDialog(item)") mdi-trash-can-outline
 
-        v-snackbar(bottom, :timeout="1500", v-model="snackbar") Shortened URL Copied!
+        DeleteDialog(v-model="dialog", :item="selected", @delete="onDelete")
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
+import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator'
+import { decodeHTMLEntities } from '@/utils'
+import { sendMessage } from '@/sysmsg'
 
-@Component
+import DeleteDialog from '@/components/DeleteDialog.vue'
+
+
+
+@Component({ components: { DeleteDialog } })
 export default class extends Vue {
-    @Prop()
+    @Prop({ default: () => [] })
     items!: any[]
 
-    snackbar = false
+    dialog = false
+    selected: any = {}
 
     headers = [
         { text: '', value: 'actions', sortable: false },
@@ -49,10 +65,36 @@ export default class extends Vue {
         { text: 'Original', value: 'original' }
     ]
 
+    decode(str: string) {
+        return decodeHTMLEntities(str)
+    }
+
     copy(key: string) {
         let text = `${location.protocol}//${location.host}/${key}`
         navigator.clipboard.writeText(text)
-        this.snackbar = true
+        sendMessage('Shortened URL copied!')
+    }
+
+    showDialog(item: any) {
+        this.dialog = true
+        this.selected = item
+    }
+
+    onDelete() {
+        this.update(this.items.filter(x => x !== this.selected))
+    }
+
+    @Emit()
+    update(nItems: any[]) {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+.ellipsis {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+</style>

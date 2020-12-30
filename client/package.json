@@ -7,7 +7,7 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
-    "@mdi/font": "^3.6.95",
+    "@mdi/font": "^5.4.55",
     "axios": "^0.21.0",
     "core-js": "^3.6.5",
     "generate-password": "^1.5.1",

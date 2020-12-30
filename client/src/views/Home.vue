@@ -26,23 +26,19 @@
                 outlined,
                 color="success",
                 :disabled="!valid",
+                :loading="loading",
                 @click="shorten"
             ) Shorten
             v-spacer
 
     v-card.mt-2.pa-4
-        DataTable(:items="items")
-    //- v-data-table(:headers="headers", :items="items")
-    //-     template(#item.actions="{ item }")
-    //-         v-icon.ml-2(color="primary", @click="copy(item.key)") mdi-content-copy
-
-    //-     template(#item.original="{ item }")
-    //-         a(target="_blank", :href="item.original") {{ item.original }}
+        DataTable(:items="items", @update="items = $event")
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import { generate } from 'generate-password'
+import { sendMessage } from '@/sysmsg'
 
 import DataTable from '@/components/DataTable.vue'
 
@@ -55,33 +51,14 @@ export default class extends Vue {
         { text: 'Original', value: 'original' }
     ]
 
-    items = [
-        {
-            key: 'google',
-            title: 'Google',
-            original: 'https://www.google.com',
-            favicon: 'https://tronclass.ntou.edu.tw/static/assets/images/favicon-a39daaa2.ico',
-            thumbnail: 'https://q5n8c8q9.rocketcdn.me/wp-content/uploads/2019/09/YouTube-thumbnail-size-guide-best-practices-top-examples.png',
-            summary: '在 YouTube 上盡情享受自己喜愛的影片和音樂、上傳原創內容，並與親朋好友和全世界觀眾分享你的影片。'
-        },
-        {
-            key: 'M6pcIv',
-            original: 'https://tronclass.com.tw'
-        },
-        {
-            key: 'U6r23l',
-            original: 'https://www.youtube.com'
-        },
-        {
-            key: 'ntou',
-            original: 'https://www.ntou.edu.tw'
-        }
-    ]
+    items: any[] = []
 
     valid = false
 
     key = ''
     original = ''
+
+    loading = false;
 
 
     get prefix() {
@@ -105,10 +82,38 @@ export default class extends Vue {
     }
 
     async shorten() {
-        let res = await axios.post('/api/shorten.php', {
+        this.loading = true
+        let { status, data } = await axios.post('/api/shortened', {
             key: this.key,
             original: this.original
         })
+
+        this.loading = false
+
+        switch (status) {
+            case 201:
+                this.items.push(data)
+                sendMessage('URL shortened!')
+                break
+
+            case 409:
+                sendMessage('Suffix duplicated!', { color: 'error' })
+                break
+        }
+    }
+
+    async getData() {
+        let { status, data } = await axios.get('/api/shortened')
+
+        switch (status) {
+            case 200:
+                this.items.push(...data)
+                break
+        }
+    }
+
+    mounted() {
+        this.getData()
     }
 }
 </script>
