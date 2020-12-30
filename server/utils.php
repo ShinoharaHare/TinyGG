@@ -1,8 +1,13 @@
 <?php
 
 function getIP() {
-    // return $_SERVER['REMOTE_ADDR'];
-    return $_SERVER['HTTP_X_FORWARDED_FOR'];
+    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ipAddresses = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+        return trim(end($ipAddresses));
+    }
+    else {
+        return $_SERVER['REMOTE_ADDR'];
+    }
 }
 
 function readJSON()

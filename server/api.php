@@ -6,7 +6,9 @@ require_once 'scraper.php';
 $api = new RouteSet;
 
 $api->get('/', function () {
-    echo 'API';
+    echo 'API'.'<br>';
+
+    echo getIP().'<br>';
 });
 
 // 新建短網址
