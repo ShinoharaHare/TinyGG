@@ -2,12 +2,13 @@
 v-app(dark)
     v-app-bar(app, dark, dense, height="0")
         template(#extension)
-            v-avatar
-                v-img(
-                    transition="fab-transition",
-                    :src="require('@/assets/hen.svg')"
-                )
-            h1 TinyGG
+            span(style="position: absolute")
+                v-avatar(style="float: left")
+                    v-img(
+                        transition="fab-transition",
+                        :src="require('@/assets/hen.svg')"
+                    )
+                h1(style="float: left") TinyGG
 
             v-tabs(fixed-tabs, dark)
                 v-tab(to="/")
@@ -54,9 +55,14 @@ export default class extends Vue {
 .v-tabs {
     flex: unset;
 }
+
 .v-main {
     background-color: #29539b;
     background-image: linear-gradient(315deg, #29539b 0%, #1e3b70 74%);
+}
+
+.logo {
+    position: absolute;
 }
 </style>
 
