@@ -104,7 +104,7 @@ $api->get('/shortened/:key', function ($key) {
 
 $api->put('/shortened/:key', function ($key) {
     // check if exist
-    DAO::query("SELECT * FROM shortened WHERE shortened.key='$key';");
+    DAO::query("SELECT * FROM `Shortened` WHERE Shortened.key = '$key';");
     // print_r(DAO::getResult());
 
     if(empty(DAO::getResult())){  // error
@@ -118,7 +118,7 @@ $api->put('/shortened/:key', function ($key) {
 
     $creatorID = $target['creator'];
     $newIP = $data['creator']['IP'];
-    DAO::query("UPDATE creator SET `IP`='$newIP' WHERE `ID`=$creatorID;");
+    DAO::query("UPDATE `Creator` SET `IP`='$newIP' WHERE `ID`=$creatorID;");
     if(DAO::getError()){  // error
         // echo 1;
         http_response_code(500);
@@ -126,12 +126,12 @@ $api->put('/shortened/:key', function ($key) {
     }
 
     $briefID = $target['original'];
-    $newUrl = $data['brief']['url'];
-    $newTitle = $data['brief']['title'];
-    $newFavicon = $data['brief']['favicon'];
-    $newSummary = $data['brief']['summary'];
-    $newCover = $data['brief']['cover'];
-    DAO::query("UPDATE brief SET `url`='$newUrl', `title`='$newTitle', `favicon`='$newFavicon', `summary`='$newSummary', `cover`='$newCover' WHERE `ID`=$briefID;");
+    $newUrl = $data['original']['url'];
+    $newTitle = $data['original']['title'];
+    $newFavicon = $data['original']['favicon'];
+    $newSummary = $data['original']['summary'];
+    $newCover = $data['original']['cover'];
+    DAO::query("UPDATE `Brief` SET `url`='$newUrl', `title`='$newTitle', `favicon`='$newFavicon', `summary`='$newSummary', `cover`='$newCover' WHERE `ID`=$briefID;");
     if(DAO::getError()){  // error
         // echo 2;
         http_response_code(500);
@@ -140,14 +140,14 @@ $api->put('/shortened/:key', function ($key) {
 
     $shortenedKey = $target['key'];
     $newKey = $data['key'];
-    DAO::query("UPDATE shortened SET `key`='$newKey' WHERE `key`='$shortenedKey';");
+    DAO::query("UPDATE `Shortened` SET `key`='$newKey' WHERE `key`='$shortenedKey';");
     if(DAO::getError()){  // error
         // echo 3;
         http_response_code(409);
         return ;
     }
     
-    DAO::query("select * from shortened s join brief b on s.original=b.ID join creator c on s.creator=c.ID where `key`='$newKey';");
+    DAO::query("SELECT * FROM `Shortened` s JOIN `Brief` b ON s.original = b.ID JOIN `Creator` c ON s.creator=c.ID WHERE `key`='$newKey';");
     // print_r(DAO::getResult());
 
     $newData = DAO::getResult()[0];
@@ -169,7 +169,7 @@ $api->put('/shortened/:key', function ($key) {
 });
 
 $api->delete('/shortened/:key', function ($key) {
-    DAO::query("SELECT original FROM Shortened WHERE `key` = '$key';");
+    DAO::query("SELECT original FROM `Shortened` WHERE `key` = '$key';");
     $result = DAO::getResult();
 
     if (empty($result)) {
@@ -178,8 +178,8 @@ $api->delete('/shortened/:key', function ($key) {
     } else {
         $briefID = $result[0]['original'];
 
-        DAO::query("DELETE FROM Shortened WHERE `key` = '$key';");
-        DAO::query("DELETE FROM Brief WHERE `ID` = '$briefID';");
+        DAO::query("DELETE FROM `Shortened` WHERE `key` = '$key';");
+        DAO::query("DELETE FROM `Brief` WHERE `ID` = '$briefID';");
 
         http_response_code(204);
     }
