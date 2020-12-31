@@ -1,7 +1,7 @@
 <template lang="pug">
 .mx-auto(style="width: 800px")
     .white--text.text-center.mb-12
-        v-avatar(size="200")
+        v-avatar.mr-2(tile size="200")
             v-img(
                 transition="slide-y-transition"
                 :src="require('@/assets/web-search-engine.svg')",
