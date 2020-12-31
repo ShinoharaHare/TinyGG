@@ -35,7 +35,7 @@ export default class extends Vue {
     transition = ''
 
     @Watch('$route')
-    onRouteChange(to, from) {
+    onRouteChange(to: any, from: any) {
         console.log(to)
         switch (to.name) {
             case 'Home':
