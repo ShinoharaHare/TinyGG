@@ -89,6 +89,7 @@ $api->get('/shortened/all', function () {
     sendJSON($arr);
 });
 
+// 根據key 列出所有的shortened的內容 包括brief creator內的資訊
 $api->get('/shortened/:key', function ($key) {    
     $obj = getShortened($key);
 
@@ -100,6 +101,23 @@ $api->get('/shortened/:key', function ($key) {
     }
 
     sendJSON($obj);
+});
+
+// 根據target 如果target在url裡 ex: $target = youtube
+$api->get('/test/:target' , function ($target) {    
+    //$_GET['target'] =
+    DAO::query("SELECT ID FROM Brief WHERE url LIKE '%$target%'");
+    $BriefIDs = DAO::getResult();
+    $result = array();
+
+    foreach ($BriefIDs as $i){
+        $BriefID = $i["ID"];
+        DAO::query("SELECT * FROM Shortened WHERE original = '$BriefID'");
+        $obj = getShortened(DAO::getResult()[0]["key"]);
+        array_push($result , $obj);
+    }
+    
+    sendJSON($result);
 });
 
 $api->put('/shortened/:key', function ($key) {
