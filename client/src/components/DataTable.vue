@@ -83,8 +83,8 @@ export default class extends Vue {
         this.selected = item
     }
 
-    onDelete() {
-        this.update(this.items.filter(x => x !== this.selected))
+    onDelete(item: any) {
+        this.update(this.items.filter(x => x !== item))
     }
 
     @Emit()

@@ -3,6 +3,7 @@ v-dialog(
     max-width="300",
     :value="value",
     :retain-focus="false",
+    :persistent="loading",
     @input="$emit('input', $event)"
 )
     v-card
@@ -44,13 +45,13 @@ export default class extends Vue {
 
         switch (status) {
             case 204:
-                this.$emit('delete')
+                this.$emit('delete', this.item)
                 sendMessage('Deletion succeeded')
                 break;
 
             case 404:
-                this.$emit('fail')
-                sendMessage('Failed to delete')
+                this.$emit('fail', this.item)
+                sendMessage('Failed to delete', { color: 'error' })
                 break;
         }
 

@@ -1,9 +1,10 @@
 <template lang="pug">
 v-dialog(persistent, max-width="600", v-model="value")
     v-card-text.white--text.text-center.text-h6(style="background: #1e1e1e")
-        | {{ temp.key }} 
+        | {{ item.key }}
         v-icon(color="white") mdi-arrow-right
-        |  {{ temp.original }}
+        |
+        | {{ item.original.url }}
 
     v-tabs.table-tabs(dark, flat, vertical, v-model="tab") 
         v-tab Shortened
@@ -11,21 +12,36 @@ v-dialog(persistent, max-width="600", v-model="value")
             v-text-field(dense, outlined, label="Key", v-model="temp.key")
             div
                 v-label Original
-                a.ml-4(@click="tab = 1") {{  }}
+                a.ml-4(@click="tab = 1") {{ item.original.ID }}
 
             .mt-4
                 v-label Creator
-                a.ml-4(@click="tab = 2") {{  }}
+                a.ml-4(@click="tab = 2") {{ item.creator.ID }}
 
         v-tab Brief
         v-tab-item.pa-4
             .mb-4
                 v-label ID
-                span.ml-4 {{ }}
+                span.ml-4 {{ item.original.ID }}
 
-            v-text-field(dense, outlined, label="URL", v-model="temp.original")
-            v-text-field(dense, outlined, label="Title", v-model="temp.title")
-            v-text-field(dense, outlined, label="Icon", v-model="temp.favicon")
+            v-text-field(
+                dense,
+                outlined,
+                label="URL",
+                v-model="temp.original.url"
+            )
+            v-text-field(
+                dense,
+                outlined,
+                label="Title",
+                v-model="temp.original.title"
+            )
+            v-text-field(
+                dense,
+                outlined,
+                label="Icon",
+                v-model="temp.original.favicon"
+            )
                 template(#prepend)
                     v-tooltip(bottom)
                         template(#activator="{ on, attrs }")
@@ -35,14 +51,14 @@ v-dialog(persistent, max-width="600", v-model="value")
                             v-img(
                                 ref="favicon",
                                 max-width="350",
-                                :src="temp.favicon",
+                                :src="temp.original.favicon",
                                 @error="error"
                             )
             v-text-field(
                 dense,
                 outlined,
                 label="Thumbnail",
-                v-model="temp.thumbnail"
+                v-model="temp.original.cover"
             )
                 template(#prepend)
                     v-tooltip(bottom)
@@ -50,39 +66,55 @@ v-dialog(persistent, max-width="600", v-model="value")
                             v-icon(v-bind="attrs", v-on="on") mdi-eye
 
                         span
-                            v-img(:src="temp.thumbnail", max-width="350")
+                            v-img(:src="temp.original.cover", max-width="350")
 
             v-textarea(
                 outlined,
                 no-resize,
                 label="Summary",
                 height="70",
-                v-model="temp.summary"
+                v-model="temp.original.summary"
             )
 
         v-tab Creator
         v-tab-item.pa-4
             .mb-4
                 v-label ID
-                span.ml-4 {{ }}
+                span.ml-4 {{ item.creator.ID }}
 
-            v-text-field(dense, outlined, label="IPv4")
-            v-text-field(dense, outlined, label="IPv6")
+            v-text-field(
+                dense,
+                outlined,
+                label="IP",
+                v-model="temp.creator.IP"
+            )
 
         v-spacer
 
         v-card-actions
             v-spacer
-            v-btn(outlined, color="error", @click="") Delete
+            v-btn(outlined, color="error", @click="dialog = true") Delete
+
             v-btn(outlined, @click="$emit('input', false)") Cancel
-            v-btn(outlined, color="light-blue lighten-1", @click="save") Save
+
+            v-btn(
+                outlined,
+                color="light-blue lighten-1",
+                :loading="saving",
+                @click="save"
+            ) Save
             v-spacer
+
+        DeleteDialog(v-model="dialog", :item="item", @delete="this.delete")
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
+import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator'
+import { sendMessage } from '@/sysmsg'
 
-@Component
+import DeleteDialog from '@/components/DeleteDialog.vue'
+
+@Component({ components: { DeleteDialog } })
 export default class extends Vue {
     @Prop({ default: false })
     value!: boolean
@@ -91,20 +123,48 @@ export default class extends Vue {
     item!: any
 
     tab = 0
-
     temp: any = {}
+    dialog = false
+
+    saving = false
 
     error(e: any) {
         console.log(this.$refs.favicon)
     }
 
     async save() {
+        this.saving = true
+        let { status, data } = await axios.put(`/api/shortened/${this.item.key}`, this.temp)
+        this.saving = false
 
+        switch (status) {
+            case 200:
+                sendMessage('Data Updated')
+                this.update(data)
+                break
+
+            case 404:
+                sendMessage('The Record Does Not Exist', { color: 'error' })
+                break
+
+            default:
+                sendMessage('Failed To Update The Record', { color: 'error' })
+        }
+    }
+
+    @Emit()
+    delete(item: any) {
+    }
+
+    @Emit()
+    update(item: any) {
     }
 
     @Watch('item')
     onItemUpdate() {
-        this.temp = this.item
+        this.temp = Object.assign({}, this.item)
+        this.temp.original = Object.assign({}, this.item.original)
+        this.temp.creator = Object.assign({}, this.item.creator)
     }
 }
 </script>
