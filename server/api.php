@@ -89,6 +89,7 @@ $api->get('/shortened/all', function () {
     sendJSON($arr);
 });
 
+// 根據key 列出所有的shortened的內容 包括brief creator內的資訊
 $api->get('/shortened/:key', function ($key) {    
     $obj = getShortened($key);
 
@@ -102,9 +103,26 @@ $api->get('/shortened/:key', function ($key) {
     sendJSON($obj);
 });
 
+// 根據target 如果target在url裡 ex: $target = youtube
+$api->get('/test/:target' , function ($target) {    
+    //$_GET['target'] =
+    DAO::query("SELECT ID FROM Brief WHERE url LIKE '%$target%'");
+    $BriefIDs = DAO::getResult();
+    $result = array();
+
+    foreach ($BriefIDs as $i){
+        $BriefID = $i["ID"];
+        DAO::query("SELECT * FROM Shortened WHERE original = '$BriefID'");
+        $obj = getShortened(DAO::getResult()[0]["key"]);
+        array_push($result , $obj);
+    }
+    
+    sendJSON($result);
+});
+
 $api->put('/shortened/:key', function ($key) {
     // check if exist
-    DAO::query("SELECT * FROM shortened WHERE shortened.key='$key';");
+    DAO::query("SELECT * FROM Shortened WHERE Shortened.key='$key';");
     // print_r(DAO::getResult());
 
     if(empty(DAO::getResult())){  // error
@@ -118,7 +136,7 @@ $api->put('/shortened/:key', function ($key) {
 
     $creatorID = $target['creator'];
     $newIP = $data['creator']['IP'];
-    DAO::query("UPDATE creator SET `IP`='$newIP' WHERE `ID`=$creatorID;");
+    DAO::query("UPDATE Breator SET `IP`='$newIP' WHERE `ID`=$creatorID;");
     if(DAO::getError()){  // error
         // echo 1;
         http_response_code(500);
@@ -131,7 +149,7 @@ $api->put('/shortened/:key', function ($key) {
     $newFavicon = $data['brief']['favicon'];
     $newSummary = $data['brief']['summary'];
     $newCover = $data['brief']['cover'];
-    DAO::query("UPDATE brief SET `url`='$newUrl', `title`='$newTitle', `favicon`='$newFavicon', `summary`='$newSummary', `cover`='$newCover' WHERE `ID`=$briefID;");
+    DAO::query("UPDATE Brief SET `url`='$newUrl', `title`='$newTitle', `favicon`='$newFavicon', `summary`='$newSummary', `cover`='$newCover' WHERE `ID`=$briefID;");
     if(DAO::getError()){  // error
         // echo 2;
         http_response_code(500);
@@ -140,7 +158,7 @@ $api->put('/shortened/:key', function ($key) {
 
     $shortenedKey = $target['key'];
     $newKey = $data['key'];
-    DAO::query("UPDATE shortened SET `key`='$newKey' WHERE `key`='$shortenedKey';");
+    DAO::query("UPDATE Shortened SET `key`='$newKey' WHERE `key`='$shortenedKey';");
     if(DAO::getError()){  // error
         // echo 3;
         http_response_code(409);
