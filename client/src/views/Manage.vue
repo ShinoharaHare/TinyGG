@@ -1,6 +1,6 @@
 <template lang="pug">
-.mx-auto(style="width: 600px")
-    .white--text.text-center.mb-12
+.mx-auto.wrapper(style="width: 600px")
+    .header.white--text.text-center
         v-avatar(tile size="100" )
             v-img(
                 transition="fab-transition"
@@ -124,3 +124,14 @@ export default class extends Vue {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+.wrapper {
+    position: relative;
+    top: -20px;
+}
+
+.header {
+    margin-bottom: 80px;
+}
+</style>
