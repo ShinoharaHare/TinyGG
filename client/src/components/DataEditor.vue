@@ -7,18 +7,25 @@ v-dialog(persistent, max-width="600", v-model="value")
         | {{ item.original.url }}
 
     v-tabs.table-tabs(dark, flat, vertical, v-model="tab") 
-        v-tab Shortened
+        v-tab 
+            v-icon.mr-2 mdi-link
+            | Shortened
         v-tab-item.pa-4
             v-text-field(dense, outlined, label="Key", v-model="temp.key")
             div
-                v-label Original
+                v-label Original ID
                 a.ml-4(@click="tab = 1") {{ item.original.ID }}
+                    v-icon.ml-2.mb-1(color="primary") mdi-pencil-outline
 
             .mt-4
-                v-label Creator
+                v-label Creator ID
                 a.ml-4(@click="tab = 2") {{ item.creator.ID }}
+                    v-icon.ml-2.mb-1(color="primary") mdi-pencil-outline
 
-        v-tab Brief
+
+        v-tab
+            v-icon.mr-2 mdi-information-variant
+            | Brief
         v-tab-item.pa-4
             .mb-4
                 v-label ID
@@ -70,13 +77,15 @@ v-dialog(persistent, max-width="600", v-model="value")
 
             v-textarea(
                 outlined,
-                no-resize,
+                
                 label="Summary",
                 height="70",
                 v-model="temp.original.summary"
             )
 
-        v-tab Creator
+        v-tab 
+            v-icon.mr-2 mdi-ip-network
+            | Brief
         v-tab-item.pa-4
             .mb-4
                 v-label ID

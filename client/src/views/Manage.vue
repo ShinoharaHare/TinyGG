@@ -1,5 +1,13 @@
 <template lang="pug">
-.mx-auto(style="width: 800px")
+.mx-auto(style="width: 600px")
+    .white--text.text-center.mb-12
+        v-avatar(tile size="100" )
+            v-img(
+                transition="fab-transition"
+                :src="require('@/assets/settings.svg')",
+            )
+        span.text-h2 Data Mangager
+
     v-card
         v-card-text
             v-overflow-btn.mx-12(label="Filter", :items="filters")
@@ -25,7 +33,17 @@
                     v-icon.mr-2(@click="showEditor(item)") mdi-pencil
 
                 template(#item.original="{ item }")
-                    a(target="_blank", :href="item.original.url") {{ item.original.url }}
+                    v-tooltip(top)
+                        template(#activator="{ on, attrs }")
+                            a.ellipsis(
+                                style="max-width: 200px",
+                                target="_blank",
+                                :href="item.original.url",
+                                v-bind="attrs",
+                                v-on="on"
+                            ) {{ item.original.url }}
+
+                        span {{ item.original.url }}
 
                 template(#item.creator="{ item }")
                     td {{ item.creator.IP }}

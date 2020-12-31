@@ -92,12 +92,3 @@ export default class extends Vue {
     }
 }
 </script>
-
-<style lang="scss" scoped>
-.ellipsis {
-    display: inline-block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-</style>

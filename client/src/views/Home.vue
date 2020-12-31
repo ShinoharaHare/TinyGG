@@ -1,5 +1,14 @@
 <template lang="pug">
 .mx-auto(style="width: 800px")
+    .white--text.text-center.mb-12
+        v-avatar(size="200")
+            v-img(
+                transition="slide-y-transition"
+                :src="require('@/assets/web-search-engine.svg')",
+            )
+        span.text-h2 TinyGG
+            .text-h5 Make URLs As Short As Your Cock
+
     v-card.pa-4
         v-form(v-model="valid")
             v-text-field(
@@ -11,11 +20,13 @@
             )
             v-text-field(
                 clearable,
+                counter,
                 placeholder="Suffix",
                 prepend-icon="mdi-arrow-right",
                 append-icon="mdi-refresh",
+                maxlength="10",
                 :prefix="prefix",
-                :rules="[requiredRule]",
+                :rules="[requiredRule, suffixRule]",
                 v-model="key",
                 @click:append="randomKey"
             )
@@ -32,7 +43,7 @@
             v-spacer
 
     v-card.mt-2.pa-4
-        DataTable(:items="items", :loading="loading" @update="items = $event")
+        DataTable(:items="items", :loading="loading", @update="items = $event")
 </template>
 
 <script lang="ts">
@@ -62,7 +73,6 @@ export default class extends Vue {
 
     shortening = false
 
-
     get prefix() {
         return `${location.protocol}//${location.host}/`
     }
@@ -73,6 +83,10 @@ export default class extends Vue {
 
     urlRule(v: string) {
         return /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/.test(v) || 'Invalid URL'
+    }
+
+    suffixRule(v: string) {
+        return /^[^\\\/\?\:]+$/.test(v) || 'Invalid Characters'
     }
 
     randomKey() {

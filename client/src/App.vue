@@ -2,12 +2,23 @@
 v-app(dark)
     v-app-bar(app, dark, dense, height="0")
         template(#extension)
+            v-avatar
+                v-img(
+                    transition="fab-transition",
+                    :src="require('@/assets/hen.svg')"
+                )
+            h1 TinyGG
+
             v-tabs(fixed-tabs, dark)
-                v-tab(to="/") Home
-                v-tab(to="/manage") Manage
+                v-tab(to="/")
+                    v-icon.mr-2 mdi-home
+                    | Home
+                v-tab(to="/manage") 
+                    v-icon.mr-2 mdi-cogs
+                    | Manage
 
     v-main.align-center
-        v-scale-transition(mode="out-in")
+        transition(:name="transition", mode="out-in")
             router-view
 
     SystemMessage
@@ -21,6 +32,21 @@ import SystemMessage from '@/components/SystemMessage.vue'
 
 @Component({ components: { SystemMessage } })
 export default class extends Vue {
+    transition = ''
+
+    @Watch('$route')
+    onRouteChange(to, from) {
+        console.log(to)
+        switch (to.name) {
+            case 'Home':
+                this.transition = 'scroll-x-reverse-transition'
+                break
+
+            case 'Manage':
+                this.transition = 'scroll-x-transition'
+                break
+        }
+    }
 }
 </script>
 
@@ -37,5 +63,12 @@ export default class extends Vue {
 <style lang="scss">
 ::-webkit-scrollbar {
     display: none;
+}
+
+.ellipsis {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 </style>
