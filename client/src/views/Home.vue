@@ -108,6 +108,8 @@ export default class extends Vue {
 
         switch (status) {
             case 201:
+                this.original = ''
+                this.key = ''
                 this.items.push(data)
                 sendMessage('URL shortened!')
                 break
