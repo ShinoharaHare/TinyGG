@@ -77,7 +77,6 @@ v-dialog(persistent, max-width="600", v-model="value")
 
             v-textarea(
                 outlined,
-                
                 label="Summary",
                 height="70",
                 v-model="temp.original.summary"
@@ -85,7 +84,7 @@ v-dialog(persistent, max-width="600", v-model="value")
 
         v-tab 
             v-icon.mr-2 mdi-ip-network
-            | Brief
+            | Creator
         v-tab-item.pa-4
             .mb-4
                 v-label ID
