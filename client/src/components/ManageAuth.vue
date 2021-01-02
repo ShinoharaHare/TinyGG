@@ -1,5 +1,5 @@
 <template lang="pug">
-v-slide-y-reverse-transition
+v-slide-y-reverse-transition(mode="out-in")
     v-overlay.text-center(:absolute="true", v-if="!authenticated")
         .padlock.mx-auto(:class="{ unlock: unlocked }")
             .keyhole
@@ -24,7 +24,7 @@ v-slide-y-reverse-transition
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { State, Action } from 'vuex-class'
+import { State, Mutation, Action } from 'vuex-class'
 import { sendMessage } from '@/sysmsg'
 
 @Component
@@ -33,6 +33,8 @@ export default class extends Vue {
     authenticated!: boolean
     @Action('authenticate')
     _authenticate!: Function
+    @Mutation
+    setAuth!: Function
 
     value = true
     valid = false
@@ -40,20 +42,16 @@ export default class extends Vue {
     loading = false
     unlocked = true
 
-    unlock() {
-        this.unlocked = true
-        setTimeout(() => {
-            this.value = false
-        }, 500)
-    }
-
     async authenticate() {
         this.loading = true
         let auth = await this._authenticate(this.password)
         this.loading = false
 
         if (auth) {
-            this.unlock()
+            this.unlocked = true
+            setTimeout(() => {
+                this.setAuth(true)
+            }, 500)
         } else {
             sendMessage('Authentication Failed', { color: 'error' })
         }

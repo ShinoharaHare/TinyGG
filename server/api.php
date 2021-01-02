@@ -146,7 +146,12 @@ $api->put('/shortened/:key', function ($key) {
 
     $shortenedKey = $target['key'];
     $newKey = $data['key'];
-    DAO::query("UPDATE `Shortened` SET `key`='$newKey' WHERE `key`='$shortenedKey';");
+    $newClick = $data['click'];
+    
+    DAO::query("UPDATE `Shortened`
+        SET `key`='$newKey', `click`=$newClick
+        WHERE `key`='$shortenedKey';");
+
     if(DAO::getError()){  // error
         // echo 3;
         http_response_code(409);
@@ -158,6 +163,7 @@ $api->put('/shortened/:key', function ($key) {
 
     $newData = DAO::getResult()[0];
     $JSON = array(  'key' => $newData['key'],
+                    'click' => $newData['click'],
                     'original' => array(
                         'ID' => $newData['original'],
                         'url' => $newData['url'],
@@ -252,9 +258,11 @@ function getShortened($key){
     DAO::query("SELECT * FROM `Creator` WHERE `ID` = '$CreatorID'"); 
     $Creator = DAO::getResult()[0];
     
-    $obj = array("key" => $key , "original" => $Brief , "creator" => $Creator);
+    $data = $Shortened[0];
+    $data['original'] = $Brief;
+    $data['creator'] = $Creator;
 
-    return($obj);
+    return($data);
 }
 
 function filterByIP($ip) {
@@ -302,18 +310,19 @@ function filterByTitleLength($length) {
     foreach (DAO::getResult() as $newData) {
         array_push($JSON, [
             'key' => $newData['key'],
-                        'original' => array(
-                            'ID' => $newData['original'],
-                            'url' => $newData['url'],
-                            'title' => $newData['title'],
-                            'favicon' => $newData['favicon'],
-                            'summary' => $newData['summary'],
-                            'cover' => $newData['cover']
-                        ),
-                        'creator' => array(
-                            'ID' => $newData['creator'],
-                            'IP' => $newData['IP']
-                        )
+            'click' => $newData['click'],
+            'original' => array(
+                'ID' => $newData['original'],
+                'url' => $newData['url'],
+                'title' => $newData['title'],
+                'favicon' => $newData['favicon'],
+                'summary' => $newData['summary'],
+                'cover' => $newData['cover']
+            ),
+            'creator' => array(
+                'ID' => $newData['creator'],
+                'IP' => $newData['IP']
+            )
         ]);
     }
     sendJSON($JSON);

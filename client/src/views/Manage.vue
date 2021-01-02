@@ -1,7 +1,9 @@
 <template lang="pug">
-div(style="height: calc(100vh - 48px)" )
-    .mx-auto.wrapper(style="width: 600px")
-        .header.white--text.text-center
+div(style="height: 100%; width: 100%")
+    ManageAuth
+
+    .mx-auto(style="width: 600px; position: relative; top: 100px")
+        .white--text.text-center
             v-avatar(tile, size="100")
                 v-img(
                     transition="fab-transition",
@@ -9,24 +11,30 @@ div(style="height: calc(100vh - 48px)" )
                 )
             span.text-h2 Data Mangager
 
-        v-card
+        v-card(style="margin-top: 80px")
             v-card-text
-                v-overflow-btn(label="Filter", :items="filters", v-model="filter")
-                v-expand-transition(group, mode="out-in")
-                    v-text-field(
-                        outlined,
-                        label="URL",
-                        v-model="url",
-                        v-if="filter == 'url'"
+                v-form(v-model="valid" )
+                    v-overflow-btn(
+                        label="Filter",
+                        :items="filters",
+                        v-model="filter"
                     )
-                    v-text-field(
-                        outlined,
-                        label="Title Length",
-                        prefix="Greater Than",
-                        type="number",
-                        v-model="length",
-                        v-if="filter == 'title-length'"
-                    )
+                    v-expand-transition(group, mode="out-in")
+                        v-text-field(
+                            outlined,
+                            label="URL",
+                            :rules="[v => !!v || 'Required']"
+                            v-model="url",
+                            v-if="filter == 'url'"
+                        )
+                        v-text-field(
+                            outlined,
+                            label="Title Length",
+                            prefix="Greater Than",
+                            type="number",
+                            v-model="length",
+                            v-if="filter == 'title-length'"
+                        )
 
             v-card-actions
                 v-spacer
@@ -34,6 +42,7 @@ div(style="height: calc(100vh - 48px)" )
                     outlined,
                     color="primary",
                     :loading="loading",
+                    :disabled="!valid"
                     @click="query"
                 ) Query
                 v-spacer
@@ -70,7 +79,6 @@ div(style="height: calc(100vh - 48px)" )
                 @update="onItemUpdate",
                 @delete="onItemDelete"
             )
-    ManageAuth
 </template>
 
 <script lang="ts">
@@ -84,6 +92,7 @@ export default class extends Vue {
     filter = 'all'
     url = ''
     length = 0
+    valid = false
 
     filters = [
         { text: 'All', value: 'all' },
@@ -166,11 +175,6 @@ export default class extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.wrapper {
-    position: relative;
-    top: 150px;
-}
-
 .header {
     margin-bottom: 80px;
 }

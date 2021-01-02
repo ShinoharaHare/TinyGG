@@ -1,5 +1,5 @@
 <template lang="pug">
-div
+div(style="height: 100%; width: 100%")
     .mx-auto(style="width: 800px")
         .white--text.text-center.mb-12
             v-avatar.mr-2(tile size="200")
@@ -150,7 +150,7 @@ export default class extends Vue {
 <style lang="scss" scoped>
 .rank-table {
     position: absolute;
-    top: 0px;
+    top: 50px;
     right: 100px;
     height: 700px;
     width: 300px;

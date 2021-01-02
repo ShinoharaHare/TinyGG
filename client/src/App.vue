@@ -18,7 +18,7 @@ v-app(dark)
                     v-icon.mr-2 mdi-cogs
                     | Manage
 
-    v-main.align-center
+    v-main
         transition(:name="transition", mode="out-in")
             router-view
 
@@ -62,6 +62,8 @@ export default class extends Vue {
     flex: unset;
 }
 
+
+
 .v-main {
     background-color: #29539b;
     background-image: linear-gradient(315deg, #29539b 0%, #1e3b70 74%);
@@ -73,13 +75,23 @@ export default class extends Vue {
 </style>
 
 <style lang="scss">
-body {
-    width: 100%;
-    height: 100%;
-}
-
 ::-webkit-scrollbar {
     display: none;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+.v-main {
+    height: 100%;
+    width: 100%;
+}
+
+.v-main__wrap {
+    height: 100%;
+    width: 100%;
 }
 
 .ellipsis {

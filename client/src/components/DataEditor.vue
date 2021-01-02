@@ -1,9 +1,10 @@
 <template lang="pug">
 v-dialog(persistent, max-width="600", v-model="value")
-    v-card-text.white--text.text-center.text-h6.ellipsis(
+    v-card-text.white--text.text-center.text-h6.ellipsis.d-block(
         style="background: #1e1e1e;"
     )
         | {{ item.key }}
+        |
         v-icon(color="white") mdi-arrow-right
         |
         | {{ item.original.url }}
@@ -14,6 +15,7 @@ v-dialog(persistent, max-width="600", v-model="value")
             | Shortened
         v-tab-item.pa-4
             v-text-field(dense, outlined, label="Key", v-model="temp.key")
+            v-text-field(dense, outlined, label="Click", v-model="temp.click")
             div
                 v-label Original ID
                 a.ml-4(@click="tab = 1") {{ item.original.ID }}

@@ -11,7 +11,7 @@ v-data-table.rank-table(
     :loading="loading"
 ) 
     template(#top)
-        v-toolbar(flat, color="#1e1e1e")
+        v-toolbar.rounded(flat, color="#1e1e1e")
             v-toolbar-title Click Through Rate
 
     template(#item.rank="{ item }")
