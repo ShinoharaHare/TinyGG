@@ -171,7 +171,7 @@ $api->put('/shortened/:key', function ($key) {
     $newData = DAO::getResult()[0];
     $JSON = array(  'key' => $newData['key'],
                     'original' => array(
-                        'ID' => $newData['ID'],
+                        'ID' => $newData['original'],
                         'url' => $newData['url'],
                         'title' => $newData['title'],
                         'favicon' => $newData['favicon'],
@@ -179,7 +179,7 @@ $api->put('/shortened/:key', function ($key) {
                         'cover' => $newData['cover']
                     ),
                     'creator' => array(
-                        'ID' => $newData['ID'],
+                        'ID' => $newData['creator'],
                         'IP' => $newData['IP']
                     ));
     sendJSON($JSON);
