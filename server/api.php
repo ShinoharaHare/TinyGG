@@ -106,10 +106,10 @@ $api->get('/shortened/:key', function ($key) {
 // 根據target 如果target在url裡 ex: $target = youtube
 $api->get('/test/:target' , function ($target) {    
     //$_GET['target'] =
+    $result = array();  
     DAO::query("SELECT ID FROM Brief WHERE url LIKE '%$target%'");
     $BriefIDs = DAO::getResult();
-    $result = array();
-
+    
     foreach ($BriefIDs as $i){
         $BriefID = $i["ID"];
         DAO::query("SELECT * FROM Shortened WHERE original = '$BriefID'");
@@ -119,6 +119,12 @@ $api->get('/test/:target' , function ($target) {
     
     sendJSON($result);
 });
+
+// 回傳creator跟他所創建的短網址的總點擊數
+$api->get('/returnSC' , function () {
+    DAO::query("SELECT ID , IP , sum(click) as TotalClick FROM `Shortened` , `Creator` WHERE Shortened.creator = Creator.ID GROUP BY ID");
+    sendJSON(DAO::getResult());
+});  
 
 $api->put('/shortened/:key', function ($key) {
     // check if exist
