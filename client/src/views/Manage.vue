@@ -168,7 +168,7 @@ export default class extends Vue {
 <style lang="scss" scoped>
 .wrapper {
     position: relative;
-    top: 50px;
+    top: 150px;
 }
 
 .header {
