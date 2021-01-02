@@ -42,7 +42,7 @@ function insertShortenedQuery($key , $BriefID , $CreatorID){
         die("insertShortenedQuery(): parameters shout BE NOT NULL!!!");
     }
 
-    $sqlQuery = "INSERT INTO `Shortened` VALUES('$key' , $BriefID , $CreatorID);";
+    $sqlQuery = "INSERT INTO `Shortened` VALUES('$key' , $BriefID , $CreatorID, 0);";
 
     return $sqlQuery;
 }

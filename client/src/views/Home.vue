@@ -1,49 +1,52 @@
 <template lang="pug">
-.mx-auto(style="width: 800px")
-    .white--text.text-center.mb-12
-        v-avatar.mr-2(tile size="200")
-            v-img(
-                transition="slide-y-transition"
-                :src="require('@/assets/web-search-engine.svg')",
-            )
-        span.text-h2 TinyGG
-            .text-h5 Make URLs As Short As Your Cock
+div
+    .mx-auto(style="width: 800px")
+        .white--text.text-center.mb-12
+            v-avatar.mr-2(tile size="200")
+                v-img(
+                    transition="slide-y-transition"
+                    :src="require('@/assets/web-search-engine.svg')",
+                )
+            span.text-h2 TinyGG
+                .text-h5 Make URLs As Short As Your Cock
 
-    v-card.pa-4
-        v-form(v-model="valid")
-            v-text-field(
-                clearable,
-                prepend-icon="mdi-link",
-                placeholder="URL to be shortened",
-                :rules="[requiredRule, urlRule]",
-                v-model="original"
-            )
-            v-text-field(
-                clearable,
-                counter,
-                placeholder="Suffix",
-                prepend-icon="mdi-arrow-right",
-                append-icon="mdi-refresh",
-                maxlength="10",
-                :prefix="prefix",
-                :rules="[requiredRule, suffixRule]",
-                v-model="key",
-                @click:append="randomKey"
-            )
+        v-card.pa-4
+            v-form(v-model="valid")
+                v-text-field(
+                    clearable,
+                    prepend-icon="mdi-link",
+                    placeholder="URL to be shortened",
+                    :rules="[requiredRule, urlRule]",
+                    v-model="original"
+                )
+                v-text-field(
+                    clearable,
+                    counter,
+                    placeholder="Suffix",
+                    prepend-icon="mdi-arrow-right",
+                    append-icon="mdi-refresh",
+                    maxlength="10",
+                    :prefix="prefix",
+                    :rules="[requiredRule, suffixRule]",
+                    v-model="key",
+                    @click:append="randomKey"
+                )
 
-        v-card-actions
-            v-spacer
-            v-btn(
-                outlined,
-                color="success",
-                :disabled="!valid",
-                :loading="shortening",
-                @click="shorten"
-            ) Shorten
-            v-spacer
+            v-card-actions
+                v-spacer
+                v-btn(
+                    outlined,
+                    color="success",
+                    :disabled="!valid",
+                    :loading="shortening",
+                    @click="shorten"
+                ) Shorten
+                v-spacer
 
-    v-card.mt-2.pa-4
-        DataTable(:items="items", :loading="loading", @update="items = $event")
+        v-card.mt-2.pa-4
+            DataTable(:items="items", :loading="loading", @update="items = $event")
+    
+    RankTable
 </template>
 
 <script lang="ts">
@@ -52,9 +55,10 @@ import { generate } from 'generate-password'
 import { sendMessage } from '@/sysmsg'
 
 import DataTable from '@/components/DataTable.vue'
+import RankTable from '@/components/RankTable.vue'
 
 
-@Component({ components: { DataTable } })
+@Component({ components: { DataTable, RankTable } })
 export default class extends Vue {
     headers = [
         { text: '', value: 'actions', sortable: false },
@@ -122,7 +126,11 @@ export default class extends Vue {
 
     async getData() {
         this.loading = true
-        let { status, data } = await axios.get('/api/shortened')
+        let { status, data } = await axios.get('/api/shortened', {
+            params: {
+                filter: 'ip'
+            }
+        })
         this.loading = false
 
         switch (status) {
@@ -137,3 +145,14 @@ export default class extends Vue {
     }
 }
 </script>
+
+
+<style lang="scss" scoped>
+.rank-table {
+    position: absolute;
+    top: 0px;
+    right: 100px;
+    height: 700px;
+    width: 300px;
+}
+</style>

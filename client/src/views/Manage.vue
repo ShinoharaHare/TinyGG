@@ -1,25 +1,40 @@
 <template lang="pug">
 .mx-auto.wrapper(style="width: 600px")
     .header.white--text.text-center
-        v-avatar(tile size="100" )
+        v-avatar(tile, size="100")
             v-img(
-                transition="fab-transition"
-                :src="require('@/assets/settings.svg')",
+                transition="fab-transition",
+                :src="require('@/assets/settings.svg')"
             )
         span.text-h2 Data Mangager
 
     v-card
         v-card-text
-            v-overflow-btn.mx-12(label="Filter", :items="filters")
-
-            //- div
-            //-     v-text-field(outlined label="ID")
-            //-     v-text-field(outlined label="IPv4")
-            //-     v-text-field(outlined label="IPv6")
+            v-overflow-btn(label="Filter", :items="filters", v-model="filter")
+            v-expand-transition(group mode="out-in")
+                v-text-field(
+                    outlined,
+                    label="URL",
+                    v-model="url",
+                    v-if="filter == 'url'"
+                )
+                v-text-field(
+                    outlined,
+                    label="Title Length",
+                    prefix="Greater Than",
+                    type="number",
+                    v-model="length",
+                    v-if="filter == 'title-length'"
+                )
 
         v-card-actions
             v-spacer
-            v-btn.mx-auto(outlined, color="primary") Query
+            v-btn.mx-auto(
+                outlined,
+                color="primary",
+                :loading="loading",
+                @click="query"
+            ) Query
             v-spacer
 
     v-card.mt-4(max-height="600")
@@ -59,12 +74,20 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import DataEditor from '@/components/DataEditor.vue'
+import ManageAuth from '@/components/ManageAuth.vue'
 
-@Component({ components: { DataEditor } })
+
+@Component({ components: { DataEditor, ManageAuth } })
 export default class extends Vue {
+    filter = 'all'
+    url = ''
+    length = 0
+
     filters = [
         { text: 'All', value: 'all' },
-        { text: 'Creator', value: 'creator' },
+        // { text: 'Creator', value: 'creator' },
+        { text: 'URL', value: 'url' },
+        { text: 'Title Length', value: 'title-length' }
     ]
 
     headers = [
@@ -90,6 +113,36 @@ export default class extends Vue {
         return this.items[this.index]
     }
 
+    get queryOptions() {
+        let query: any = {}
+        switch (this.filter) {
+            case 'url':
+                query.filter = 'url'
+                query.url = this.url
+                break
+
+            case 'title-length':
+                query.filter = 'title-length'
+                query.length = this.length
+                break
+
+            case 'all':
+        }
+        return query
+    }
+
+    async query() {
+        this.loading = true
+        let { status, data } = await axios.get('/api/shortened', { params: this.queryOptions })
+        this.loading = false
+
+        switch (status) {
+            case 200:
+                this.items = data
+                break
+        }
+    }
+
     showEditor(item: any) {
         this.editor = true
         this.index = this.items.indexOf(item)
@@ -105,22 +158,7 @@ export default class extends Vue {
         this.items.splice(this.index!, 1)
     }
 
-    async getData() {
-        this.loading = true
-        let { status, data } = await axios.get('/api/shortened/all')
-        this.loading = false
-
-        switch (status) {
-            case 200:
-                this.items.push(...data)
-                break
-        }
-
-        console.log(data)
-    }
-
     mounted() {
-        this.getData()
     }
 }
 </script>

@@ -99,8 +99,12 @@ $api->get('/shortened/:key', function ($key) {
 });
 
 // 回傳creator跟他所創建的短網址的總點擊數
-$api->get('/returnSC' , function () {
-    DAO::query("SELECT ID , IP , sum(click) as totalClick FROM `Shortened` , `Creator` WHERE Shortened.creator = Creator.ID GROUP BY ID");
+$api->get('/rank' , function () {
+    DAO::query("SELECT ID , IP , sum(click) as clicks
+        FROM Shortened, Creator
+        WHERE Shortened.creator = Creator.ID
+        GROUP BY ID
+        ORDER BY clicks DESC");
     sendJSON(DAO::getResult());
 });
 
@@ -255,7 +259,7 @@ function filterByTitleLength($length) {
     DAO::query("SELECT * 
         FROM Shortened s join Brief b on s.original=b.ID join Creator c on s.creator=c.ID
         WHERE original IN(
-            SELECT ID FROM Brief WHERE LENGTH_CHAR(TITLE)>$length
+            SELECT ID FROM Brief WHERE CHAR_LENGTH(Title)>$length
         );");
     $JSON = array();
     foreach (DAO::getResult() as $newData) {

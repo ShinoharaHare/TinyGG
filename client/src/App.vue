@@ -37,7 +37,6 @@ export default class extends Vue {
 
     @Watch('$route')
     onRouteChange(to: any, from: any) {
-        console.log(to)
         switch (to.name) {
             case 'Home':
                 this.transition = 'scroll-x-reverse-transition'
