@@ -191,9 +191,46 @@ $api->delete('/shortened/:key', function ($key) {
     }
 });
 
-// $api->post('/shortened/:key/', function ($key) {
+use \Firebase\JWT\JWT;
+$key = 'ThgBQv7WzWgV5auB';
+$password = '12345678';
 
-// });
+$api->post('/token', function () {
+    global $key, $password;
+
+    $data = readJSON();
+
+    if (empty($data['password']) || $data['password'] != $password) {
+        http_response_code(401);
+    } else {
+        $expire = time() + 10 * 60;
+        $jwt = JWT::encode([
+            // 'iss' => 'https://tinyygg.herokuapp.com',
+            // 'aud' => 'https://tinyygg.herokuapp.com',
+            // 'iat' => time(),
+            'expire' => $expire
+        ], $key);
+
+        setcookie('token', $jwt, $expire);
+        http_response_code(200);
+    }
+});
+
+$api->post('/token/verify', function() {
+    global $key, $password;
+
+    if (empty($_COOKIE['token'])) {
+        sendJSON(false);
+    } else {
+        $decoded = (array) JWT::decode($_COOKIE['token'], $key, array('HS256'));
+        if (time() < $decoded['expire']) {
+            sendJSON(true);
+        } else {
+            sendJSON(false);
+        }
+    }
+});
+
 
 function getShortened($key){
     // find shortened

@@ -1,6 +1,7 @@
 {
     "require": {
         "corneltek/roller": "^1.9",
-        "voku/simple_html_dom": "^4.7"
+        "voku/simple_html_dom": "^4.7",
+        "firebase/php-jwt": "^5.2"
     }
 }

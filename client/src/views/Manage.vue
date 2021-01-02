@@ -1,74 +1,76 @@
 <template lang="pug">
-.mx-auto.wrapper(style="width: 600px")
-    .header.white--text.text-center
-        v-avatar(tile, size="100")
-            v-img(
-                transition="fab-transition",
-                :src="require('@/assets/settings.svg')"
-            )
-        span.text-h2 Data Mangager
-
-    v-card
-        v-card-text
-            v-overflow-btn(label="Filter", :items="filters", v-model="filter")
-            v-expand-transition(group mode="out-in")
-                v-text-field(
-                    outlined,
-                    label="URL",
-                    v-model="url",
-                    v-if="filter == 'url'"
+div(style="height: calc(100vh - 48px)" )
+    .mx-auto.wrapper(style="width: 600px")
+        .header.white--text.text-center
+            v-avatar(tile, size="100")
+                v-img(
+                    transition="fab-transition",
+                    :src="require('@/assets/settings.svg')"
                 )
-                v-text-field(
+            span.text-h2 Data Mangager
+
+        v-card
+            v-card-text
+                v-overflow-btn(label="Filter", :items="filters", v-model="filter")
+                v-expand-transition(group, mode="out-in")
+                    v-text-field(
+                        outlined,
+                        label="URL",
+                        v-model="url",
+                        v-if="filter == 'url'"
+                    )
+                    v-text-field(
+                        outlined,
+                        label="Title Length",
+                        prefix="Greater Than",
+                        type="number",
+                        v-model="length",
+                        v-if="filter == 'title-length'"
+                    )
+
+            v-card-actions
+                v-spacer
+                v-btn.mx-auto(
                     outlined,
-                    label="Title Length",
-                    prefix="Greater Than",
-                    type="number",
-                    v-model="length",
-                    v-if="filter == 'title-length'"
+                    color="primary",
+                    :loading="loading",
+                    @click="query"
+                ) Query
+                v-spacer
+
+        v-card.mt-4(max-height="600")
+            v-card-text
+                v-data-table(
+                    :headers="headers",
+                    :items="items",
+                    :loading="loading"
                 )
+                    template(#item.actions="{ item }")
+                        v-icon.mr-2(@click="showEditor(item)") mdi-pencil
 
-        v-card-actions
-            v-spacer
-            v-btn.mx-auto(
-                outlined,
-                color="primary",
-                :loading="loading",
-                @click="query"
-            ) Query
-            v-spacer
+                    template(#item.original="{ item }")
+                        v-tooltip(top)
+                            template(#activator="{ on, attrs }")
+                                a.ellipsis(
+                                    style="max-width: 200px",
+                                    target="_blank",
+                                    :href="item.original.url",
+                                    v-bind="attrs",
+                                    v-on="on"
+                                ) {{ item.original.url }}
 
-    v-card.mt-4(max-height="600")
-        v-card-text
-            v-data-table(
-                :headers="headers",
-                :items="items",
-                :loading="loading"
+                            span {{ item.original.url }}
+
+                    template(#item.creator="{ item }")
+                        td {{ item.creator.IP }}
+
+            DataEditor(
+                v-model="editor",
+                :item="selected",
+                @update="onItemUpdate",
+                @delete="onItemDelete"
             )
-                template(#item.actions="{ item }")
-                    v-icon.mr-2(@click="showEditor(item)") mdi-pencil
-
-                template(#item.original="{ item }")
-                    v-tooltip(top)
-                        template(#activator="{ on, attrs }")
-                            a.ellipsis(
-                                style="max-width: 200px",
-                                target="_blank",
-                                :href="item.original.url",
-                                v-bind="attrs",
-                                v-on="on"
-                            ) {{ item.original.url }}
-
-                        span {{ item.original.url }}
-
-                template(#item.creator="{ item }")
-                    td {{ item.creator.IP }}
-
-        DataEditor(
-            v-model="editor",
-            :item="selected",
-            @update="onItemUpdate",
-            @delete="onItemDelete"
-        )
+    ManageAuth
 </template>
 
 <script lang="ts">
@@ -166,7 +168,7 @@ export default class extends Vue {
 <style lang="scss" scoped>
 .wrapper {
     position: relative;
-    top: -20px;
+    top: 50px;
 }
 
 .header {

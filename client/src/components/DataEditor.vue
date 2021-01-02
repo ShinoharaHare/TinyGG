@@ -1,6 +1,8 @@
 <template lang="pug">
 v-dialog(persistent, max-width="600", v-model="value")
-    v-card-text.white--text.text-center.text-h6(style="background: #1e1e1e")
+    v-card-text.white--text.text-center.text-h6.ellipsis(
+        style="background: #1e1e1e;"
+    )
         | {{ item.key }}
         v-icon(color="white") mdi-arrow-right
         |
@@ -21,7 +23,6 @@ v-dialog(persistent, max-width="600", v-model="value")
                 v-label Creator ID
                 a.ml-4(@click="tab = 2") {{ item.creator.ID }}
                     v-icon.ml-2.mb-1(color="primary") mdi-pencil-outline
-
 
         v-tab
             v-icon.mr-2 mdi-information-variant

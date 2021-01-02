@@ -27,13 +27,16 @@ v-app(dark)
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator'
-
+import { Action } from 'vuex-class'
 import SystemMessage from '@/components/SystemMessage.vue'
 
 
 @Component({ components: { SystemMessage } })
 export default class extends Vue {
     transition = ''
+
+    @Action
+    checkAuth!: Function
 
     @Watch('$route')
     onRouteChange(to: any, from: any) {
@@ -46,6 +49,10 @@ export default class extends Vue {
                 this.transition = 'scroll-x-transition'
                 break
         }
+    }
+
+    mounted() {
+        this.checkAuth()
     }
 }
 </script>
@@ -66,6 +73,11 @@ export default class extends Vue {
 </style>
 
 <style lang="scss">
+body {
+    width: 100%;
+    height: 100%;
+}
+
 ::-webkit-scrollbar {
     display: none;
 }
