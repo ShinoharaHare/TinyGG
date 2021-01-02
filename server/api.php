@@ -59,27 +59,22 @@ $api->post('/shortened', function () {
 });
 
 $api->get('/shortened', function () {
-    $ip = getIP();
-    DAO::query("SELECT `ID` FROM `Creator` WHERE `IP` = '$ip';");
-    $result = DAO::getResult();
-    
-    if (empty($result)) {
-        sendJSON(array());
-        return;
-    } 
-    
-    $creatorID = $result[0]['ID'];
+    if (isset($_GET['filter'])) {
+        switch ($_GET['filter']) {
+            case 'ip':
+                filterByIP(getIP());
+                return;
 
-    DAO::query("SELECT `key` FROM `Shortened` WHERE `Creator` = '$creatorID'");
-    $result = DAO::getResult();
-    $arr = array();
-    foreach ($result as $item) {
-        array_push($arr, getShortened($item['key']));
+            case 'url':
+                filterByUrl($_GET['url']);
+                return;
+
+            case 'title-length':
+                filterByTitleLength($_GET['length']);
+                return;
+        }
     }
-    sendJSON($arr);
-});
 
-$api->get('/shortened/all', function () {
     DAO::query("SELECT `key` FROM `Shortened`;");
     $result = DAO::getResult();
     $arr = array();
@@ -88,7 +83,7 @@ $api->get('/shortened/all', function () {
     }
     sendJSON($arr);
 });
-
+ 
 // 根據key 列出所有的shortened的內容 包括brief creator內的資訊
 $api->get('/shortened/:key', function ($key) {    
     $obj = getShortened($key);
@@ -103,28 +98,11 @@ $api->get('/shortened/:key', function ($key) {
     sendJSON($obj);
 });
 
-// 根據target 如果target在url裡 ex: $target = youtube
-$api->get('/test/:target' , function ($target) {    
-    //$_GET['target'] =
-    $result = array();  
-    DAO::query("SELECT ID FROM Brief WHERE url LIKE '%$target%'");
-    $BriefIDs = DAO::getResult();
-    
-    foreach ($BriefIDs as $i){
-        $BriefID = $i["ID"];
-        DAO::query("SELECT * FROM Shortened WHERE original = '$BriefID'");
-        $obj = getShortened(DAO::getResult()[0]["key"]);
-        array_push($result , $obj);
-    }
-    
-    sendJSON($result);
-});
-
 // 回傳creator跟他所創建的短網址的總點擊數
 $api->get('/returnSC' , function () {
-    DAO::query("SELECT ID , IP , sum(click) as TotalClick FROM `Shortened` , `Creator` WHERE Shortened.creator = Creator.ID GROUP BY ID");
+    DAO::query("SELECT ID , IP , sum(click) as totalClick FROM `Shortened` , `Creator` WHERE Shortened.creator = Creator.ID GROUP BY ID");
     sendJSON(DAO::getResult());
-});  
+});
 
 $api->put('/shortened/:key', function ($key) {
     // check if exist
@@ -237,3 +215,66 @@ function getShortened($key){
 
     return($obj);
 }
+
+function filterByIP($ip) {
+    DAO::query("SELECT `ID` FROM `Creator` WHERE `IP` = '$ip';");
+    $result = DAO::getResult();
+    
+    if (empty($result)) {
+        sendJSON(array());
+        return;
+    } 
+    
+    $creatorID = $result[0]['ID'];
+
+    DAO::query("SELECT `key` FROM `Shortened` WHERE `Creator` = '$creatorID'");
+    $result = DAO::getResult();
+    $arr = array();
+    foreach ($result as $item) {
+        array_push($arr, getShortened($item['key']));
+    }
+    sendJSON($arr);
+}
+
+function filterByUrl($text) {
+    DAO::query("SELECT ID FROM Brief WHERE url LIKE '%$text%'");
+    $BriefIDs = DAO::getResult();
+    $result = array();
+
+    foreach ($BriefIDs as $i){
+        $BriefID = $i["ID"];
+        DAO::query("SELECT * FROM Shortened WHERE original = '$BriefID'");
+        $obj = getShortened(DAO::getResult()[0]["key"]);
+        array_push($result , $obj);
+    }
+    
+    sendJSON($result);
+}
+
+function filterByTitleLength($length) {
+    DAO::query("SELECT * 
+        FROM Shortened s join Brief b on s.original=b.ID join Creator c on s.creator=c.ID
+        WHERE original IN(
+            SELECT ID FROM Brief WHERE LENGTH_CHAR(TITLE)>$length
+        );");
+    $JSON = array();
+    foreach (DAO::getResult() as $newData) {
+        array_push($JSON, [
+            'key' => $newData['key'],
+                        'original' => array(
+                            'ID' => $newData['original'],
+                            'url' => $newData['url'],
+                            'title' => $newData['title'],
+                            'favicon' => $newData['favicon'],
+                            'summary' => $newData['summary'],
+                            'cover' => $newData['cover']
+                        ),
+                        'creator' => array(
+                            'ID' => $newData['creator'],
+                            'IP' => $newData['IP']
+                        )
+        ]);
+    }
+    sendJSON($JSON);
+}
+
