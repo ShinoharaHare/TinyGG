@@ -30,7 +30,7 @@ div(style="height: 100%; width: 100%")
                         v-text-field(
                             outlined,
                             label="Title Length",
-                            prefix="Greater Than",
+                            prefix="Longer Than",
                             type="number",
                             v-model="length",
                             v-if="filter == 'title-length'"
