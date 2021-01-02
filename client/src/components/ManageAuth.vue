@@ -49,7 +49,7 @@ export default class extends Vue {
 
     async authenticate() {
         this.loading = true
-        let auth = this._authenticate(this.password)
+        let auth = await this._authenticate(this.password)
         this.loading = false
 
         if (auth) {
