@@ -27,7 +27,7 @@ import { Vue, Component } from 'vue-property-decorator'
 @Component
 export default class extends Vue {
     headers: any[] = [
-        { text: 'Rank', value: 'rank' },
+        { text: 'Rank', value: 'rank', align: 'center' },
         { text: 'Creator(IP)', value: 'IP' },
         { text: 'Clicks', value: 'clicks' }
     ]
