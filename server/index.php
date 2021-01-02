@@ -29,6 +29,7 @@ $router->get('/:key', function ($key) {
     if (empty($result)) {
         redirect('public');
     } else {
+        DAO::query("UPDATE `Shortened` SET `click` = `click` + 1 WHERE `key` = '$key'");
         $url = $result[0]['url'];
         redirect($url);
     }
