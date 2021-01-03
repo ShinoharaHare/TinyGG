@@ -11,6 +11,22 @@ $api->get('/', function () {
     echo getIP().'<br>';
 });
 
+$api->get('/testGetErrorFromAPI', function() {
+    echo "<h4>INSERT INTO `Creator` VALUES(69, 'forTest');</h4>";
+    DAO::query("INSERT INTO `Creator` VALUES(69, 'forTest', 'v6');");  // primary key error
+    // DAO::query("SUCK MY `dick`;");
+    echo "<b>Error:   </b>";
+    print_r(DAO::getError());
+
+    echo "<br />";
+    echo "<h4>DELETE FROM `Creator` WHERE `ID`=69;</h4>";
+    DAO::query("DELETE FROM `Creator` WHERE `ID`=69;");  // foreign key error
+    echo "<b>Error:   </b>";
+    print_r(DAO::getError());
+    
+    http_response_code(500);
+});
+
 // 新建短網址
 $api->post('/shortened', function () {
     $data = readJSON();
