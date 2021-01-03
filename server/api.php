@@ -13,7 +13,7 @@ $api->get('/', function () {
 
 $api->get('/testGetErrorFromAPI', function() {
     echo "<h4>INSERT INTO `Creator` VALUES(69, 'forTest');</h4>";
-    DAO::query("INSERT INTO `Creator` VALUES(69, 'forTest', 'v6');");  // primary key error
+    DAO::query("INSERT INTO `Creator` VALUES(69, 'forTest');");  // primary key error
     // DAO::query("SUCK MY `dick`;");
     echo "<b>Error:   </b>";
     print_r(DAO::getError());
