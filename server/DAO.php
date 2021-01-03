@@ -18,7 +18,7 @@ class DAO {
         // echo "connect"."<br />";
         self::$connection = new mysqli($server, $dbuser, $dbpassword, $dbname);
         if(self::$connection->connect_error){
-            self::$status["error"] = self::$connection->connect_error;
+            self::setError(self::$connection->connect_error);
             echo "connect error!";
             return false;
         }else{
@@ -66,7 +66,7 @@ class DAO {
                 self::$status["sqlResult"] = $result;
                 self::setError(false);
             }else{
-                self::setError("SQL execution fail!!");
+                self::setError(self::$connection->error);
             }
         }else{
             self::setError("no connection");
