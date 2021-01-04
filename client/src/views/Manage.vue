@@ -332,9 +332,9 @@ export default class extends Vue {
     }
 
     onItemDelete(item: any) {
+        this.items.splice(this.index!, 1)
         this.index = null
         this.editor = false
-        this.items.splice(this.index!, 1)
     }
 
     mounted() {
