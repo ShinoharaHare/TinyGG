@@ -11,16 +11,41 @@ $api->get('/', function () {
     echo getIP().'<br>';
 });
 
+$api->get('/test', function () {
+    // $query = "";
+    // DAO::query($query);
+    // print_r(DAO::getError());
+    // print_r(DAO::getResult());
+});
+
 $api->get('/testGetErrorFromAPI', function() {
-    echo "<h4>INSERT INTO `Creator` VALUES(69, 'forTest');</h4>";
-    DAO::query("INSERT INTO `Creator` VALUES(69, 'forTest');");  // primary key error
-    // DAO::query("SUCK MY `dick`;");
+    echo "<h2> Primary Key Error Test</h2>";
+    $query = "SELECT * FROM `Creator` WHERE `ID`=69;";
+    echo "<h4>$query</h4>";
+    DAO::query($query);
+    print_r(DAO::getResult()[0]);
+    $query = "INSERT INTO `Creator` VALUES(69, 'forTest');";
+    echo "<h4>$query</h4>";
+    DAO::query($query);  // primary key error
     echo "<b>Error:   </b>";
     print_r(DAO::getError());
 
-    echo "<br />";
-    echo "<h4>DELETE FROM `Creator` WHERE `ID`=69;</h4>";
-    DAO::query("DELETE FROM `Creator` WHERE `ID`=69;");  // foreign key error
+    echo "<hr>";
+
+    echo "<h2> Foreign Key Error Test</h2>";
+
+    $query = "SELECT * FROM `Shortened` WHERE `creator`=15;";
+    echo "<h4>$query</h4>";
+    DAO::query($query);
+    print_r(DAO::getResult()[0]);
+
+    $query = "SELECT * FROM `Creator` WHERE `ID`=15;";
+    echo "<h4>$query</h4>";
+    DAO::query($query);
+    print_r(DAO::getResult()[0]);
+
+    echo "<h4>DELETE FROM `Creator` WHERE `ID`=15;</h4>";
+    DAO::query("DELETE FROM `Creator` WHERE `ID`=15;");  // foreign key error
     echo "<b>Error:   </b>";
     print_r(DAO::getError());
     
@@ -67,9 +92,8 @@ $api->post('/shortened', function () {
     // Insert Shortened
     DAO::query(insertShortenedQuery($key , $BriefID , $CreatorID)); // add the new shortened
 
-    if(DAO::getResult()){ // insert the new shortened successfully
-        $obj = getShortened($key);
-        sendJSON($obj);
+    if (DAO::getResult()){ // insert the new shortened successfully
+        sendJSON(getConvertedByKey($key));
         http_response_code(201);
     }
 });
@@ -77,41 +101,53 @@ $api->post('/shortened', function () {
 $api->get('/shortened', function () {
     if (isset($_GET['filter'])) {
         switch ($_GET['filter']) {
+            case 'shortened':
+                filterByShortened($_GET['key'], $_GET['click']);
+                return;
+
+            case 'brief':
+                filterByBrief($_GET['url'], $_GET['title'], $_GET['summary'], $_GET['min'], $_GET['max']);
+                return;
+
             case 'ip':
                 filterByIP(getIP());
                 return;
 
-            case 'url':
-                filterByUrl($_GET['url']);
+            case 'creator':
+                filterByIP($_GET['ip']);
                 return;
 
-            case 'title-length':
-                filterByTitleLength($_GET['length']);
+            case 'complex':
+                filterByComplex($_GET);
                 return;
         }
     }
 
-    DAO::query("SELECT `key` FROM `Shortened`;");
+    DAO::query(
+        "SELECT *
+        FROM `Shortened` 
+            JOIN `Brief` b ON `original` = b.ID 
+            JOIN `Creator` c ON `creator` = c.ID"
+    );
+
     $result = DAO::getResult();
     $arr = array();
+
     foreach ($result as $item) {
-        array_push($arr, getShortened($item['key']));
+        array_push($arr, convert($item));
     }
+
     sendJSON($arr);
 });
  
 // 根據key 列出所有的shortened的內容 包括brief creator內的資訊
 $api->get('/shortened/:key', function ($key) {    
-    $obj = getShortened($key);
-
-    if(!$obj){ // $obj = NULL
+    $data = getConvertedByKey($key);
+    if (empty($data)) {
         http_response_code(404);
+    } else {
+        sendJSON($data);
     }
-    else{
-        http_response_code(200);
-    }
-
-    sendJSON($obj);
 });
 
 // 回傳creator跟他所創建的短網址的總點擊數
@@ -139,7 +175,7 @@ $api->put('/shortened/:key', function ($key) {
     $target = DAO::getResult()[0];
 
     $creatorID = $target['creator'];
-    $newIP = $data['creator']['IP'];
+    $newIP = $data['creator']['ip'];
     DAO::query("UPDATE `Creator` SET `IP`='$newIP' WHERE `ID`=$creatorID;");
     if(DAO::getError()){  // error
         // echo 1;
@@ -152,7 +188,7 @@ $api->put('/shortened/:key', function ($key) {
     $newTitle = $data['original']['title'];
     $newFavicon = $data['original']['favicon'];
     $newSummary = $data['original']['summary'];
-    $newCover = $data['original']['cover'];
+    $newCover = $data['original']['thumbnail'];
     DAO::query("UPDATE `Brief` SET `url`='$newUrl', `title`='$newTitle', `favicon`='$newFavicon', `summary`='$newSummary', `cover`='$newCover' WHERE `ID`=$briefID;");
     if(DAO::getError()){  // error
         // echo 2;
@@ -173,26 +209,9 @@ $api->put('/shortened/:key', function ($key) {
         http_response_code(409);
         return ;
     }
-    
-    DAO::query("SELECT * FROM `Shortened` s JOIN `Brief` b ON s.original = b.ID JOIN `Creator` c ON s.creator=c.ID WHERE `key`='$newKey';");
-    // print_r(DAO::getResult());
 
-    $newData = DAO::getResult()[0];
-    $JSON = array(  'key' => $newData['key'],
-                    'click' => $newData['click'],
-                    'original' => array(
-                        'ID' => $newData['original'],
-                        'url' => $newData['url'],
-                        'title' => $newData['title'],
-                        'favicon' => $newData['favicon'],
-                        'summary' => $newData['summary'],
-                        'cover' => $newData['cover']
-                    ),
-                    'creator' => array(
-                        'ID' => $newData['creator'],
-                        'IP' => $newData['IP']
-                    ));
-    sendJSON($JSON);
+    sendJSON(getConvertedByKey($newKey));
+
     http_response_code(200);
 });
 
@@ -253,94 +272,167 @@ $api->post('/token/verify', function() {
     }
 });
 
-
-function getShortened($key){
-    // find shortened
-    DAO::query("SELECT * FROM `Shortened` WHERE `key` = '$key'"); 
-    $Shortened = DAO::getResult();
-
-    if(empty($Shortened)){
-        return NULL;
-    }
-
-    $BriefID = $Shortened[0]['original'];
-    $CreatorID = $Shortened[0]['creator'];
-    
-    // find brief
-    DAO::query("SELECT * FROM `Brief` WHERE `ID` = '$BriefID'");
-    $Brief = DAO::getResult()[0];
-
-    // find creator
-    DAO::query("SELECT * FROM `Creator` WHERE `ID` = '$CreatorID'"); 
-    $Creator = DAO::getResult()[0];
-    
-    $data = $Shortened[0];
-    $data['original'] = $Brief;
-    $data['creator'] = $Creator;
-
-    return($data);
-}
-
 function filterByIP($ip) {
-    DAO::query("SELECT `ID` FROM `Creator` WHERE `IP` = '$ip';");
+    DAO::query(
+        "SELECT *
+        FROM `Shortened` 
+            JOIN `Brief` b ON `original` = b.ID 
+            JOIN `Creator` c ON `creator` = c.ID
+        WHERE creator IN (
+            SELECT ID FROM `Creator`
+            WHERE IP LIKE '%$ip%'
+        );"
+    );
     $result = DAO::getResult();
     
     if (empty($result)) {
         sendJSON(array());
         return;
-    } 
-    
-    $creatorID = $result[0]['ID'];
+    }
 
-    DAO::query("SELECT `key` FROM `Shortened` WHERE `Creator` = '$creatorID'");
-    $result = DAO::getResult();
     $arr = array();
     foreach ($result as $item) {
-        array_push($arr, getShortened($item['key']));
+        array_push($arr, convert($item));
     }
     sendJSON($arr);
 }
 
-function filterByUrl($text) {
-    DAO::query("SELECT ID FROM Brief WHERE url LIKE '%$text%'");
-    $BriefIDs = DAO::getResult();
-    $result = array();
+function filterByShortened($key, $click) {
+    $query = 
+        "SELECT *
+        FROM `Shortened` 
+            JOIN `Brief` b ON `original` = b.ID 
+            JOIN `Creator` c ON `creator` = c.ID
+        WHERE `key` IN (
+            SELECT `key` FROM `Shortened`
+            WHERE
+                `key` LIKE '%$key%'
+                AND `click` >= $click
+        );";
+    DAO::query($query);
 
-    foreach ($BriefIDs as $i){
-        $BriefID = $i["ID"];
-        DAO::query("SELECT * FROM Shortened WHERE original = '$BriefID'");
-        $obj = getShortened(DAO::getResult()[0]["key"]);
-        array_push($result , $obj);
+    print_r(DAO::getError());
+    $result = DAO::getResult();
+    $arr = array();
+    foreach ($result as $item) {
+        array_push($arr, convert($item));
     }
-    
-    sendJSON($result);
+    sendJSON($arr);
 }
 
-function filterByTitleLength($length) {
-    DAO::query("SELECT * 
-        FROM Shortened s join Brief b on s.original=b.ID join Creator c on s.creator=c.ID
-        WHERE original IN(
-            SELECT ID FROM Brief WHERE CHAR_LENGTH(Title)>$length
-        );");
-    $JSON = array();
-    foreach (DAO::getResult() as $newData) {
-        array_push($JSON, [
-            'key' => $newData['key'],
-            'click' => $newData['click'],
-            'original' => array(
-                'ID' => $newData['original'],
-                'url' => $newData['url'],
-                'title' => $newData['title'],
-                'favicon' => $newData['favicon'],
-                'summary' => $newData['summary'],
-                'cover' => $newData['cover']
-            ),
-            'creator' => array(
-                'ID' => $newData['creator'],
-                'IP' => $newData['IP']
+function filterByBrief($url, $title, $summary, $min, $max) {
+    $query = 
+        "SELECT *
+        FROM `Shortened` 
+            JOIN `Brief` b ON `original` = b.ID 
+            JOIN `Creator` c ON `creator` = c.ID
+        WHERE original IN (
+            SELECT ID FROM `Brief`
+            WHERE
+                url LIKE '%$url%'
+                AND title LIKE '%$title%'
+                AND summary LIKE '%$summary%'
+                AND CHAR_LENGTH(title) >= $min
+                AND CHAR_LENGTH(title) <= $max
+        );";
+            
+    DAO::query($query);
+
+    $result = DAO::getResult();
+    $arr = array();
+    foreach ($result as $item) {
+        array_push($arr, convert($item));
+    }
+    sendJSON($arr);
+}
+
+function filterByComplex($params) {
+    $key = $params['key'];
+    $click = $params['click'];
+    $url = $params['url'];
+    $title = $params['title'];
+    $summary = $params['summary'];
+    $min = $params['min'];
+    $max = $params['max'];
+    $ip = $params['ip'];
+    // $key = isset($params['key']) ? $params['key'] : '';
+    // $click = isset($params['click']) ? $params['click'] : '';
+    // $url = isset($params['url']) ? $params['url'] : '';
+    // $title = isset($params['title']) ? $params['title'] : '';
+    // $summary = isset($params['summary']) ? $params['summary'] : '';
+    // $min = isset($params['min']) ? $params['min'] : '';
+    // $max = isset($params['max']) ? $params['max'] : '';
+    // $ip = isset($params['ip']) ? $params['ip'] : '';
+
+    $query = 
+        "SELECT *
+        FROM `Shortened` 
+            JOIN `Brief` b ON `original` = b.ID 
+            JOIN `Creator` c ON `creator` = c.ID
+        WHERE 
+            `key` IN (
+                SELECT `key` FROM `Shortened`
+                WHERE
+                    `key` LIKE '%$key%'
+                    AND `click` >= $click
             )
-        ]);
+            AND
+            original IN (
+                SELECT ID FROM `Brief`
+                WHERE
+                    url LIKE '%$url%'
+                    AND title LIKE '%$title%'
+                    AND summary LIKE '%$summary%'
+                    AND CHAR_LENGTH(title) >= $min
+                    AND CHAR_LENGTH(title) <= $max
+            )
+            AND
+            creator IN (
+                SELECT ID FROM `Creator`
+                WHERE IP LIKE '%$ip%'
+            );";
+
+    DAO::query($query);
+
+    $result = DAO::getResult();
+    $arr = array();
+    foreach ($result as $item) {
+        array_push($arr, convert($item));
     }
-    sendJSON($JSON);
+    sendJSON($arr);
 }
 
+function getConvertedByKey($key) {
+    DAO::query(
+        "SELECT *
+        FROM `Shortened` 
+            JOIN `Brief` b ON `original` = b.ID 
+            JOIN `Creator` c ON `creator` = c.ID
+        WHERE `key` = '$key';"
+    );
+    $result = DAO::getResult();
+    return empty($result) ? null : convert($result[0]);
+}
+
+function convert($table) {
+    $original = [
+        'id' => $table['original'],
+        'url' => $table['url'],
+        'title' => $table['title'],
+        'summary' => $table['summary'],
+        'thumbnail' => $table['cover'],
+        'favicon' => $table['favicon']
+    ];
+
+    $creator = [
+        'id' => $table['creator'],
+        'ip' => $table['IP'],
+    ];
+
+    return [
+        'key' => $table['key'],
+        'click' => $table['click'],
+        'original' => $original,
+        'creator' => $creator
+    ];
+}

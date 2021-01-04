@@ -1,5 +1,5 @@
 <template lang="pug">
-v-data-table(:headers="headers", :items="items", :loading="loading")
+v-data-table(:headers="headers", :items="items", :loading="loading" height="300" )
     template(#item.original="{ item }")
         v-tooltip(top)
             template(#activator="{ on, attrs }")
@@ -11,7 +11,7 @@ v-data-table(:headers="headers", :items="items", :loading="loading")
                     v-on="on"
                 ) {{ item.original.url }}
             span
-                v-img(:src="item.original.cover", max-width="350")
+                v-img(:src="item.original.thumbnail", max-width="350")
 
     template(#item.title="{ item }")
         v-tooltip(top, max-width="300")

@@ -1,30 +1,31 @@
 <template lang="pug">
 v-slide-y-reverse-transition(mode="out-in")
-    v-overlay.text-center(:absolute="true", v-if="!authenticated")
-        .padlock.mx-auto(:class="{ unlock: unlocked }")
-            .keyhole
+    .overlay-wrapper(v-if="value")
+        v-overlay.text-center(:absolute="true")
+            .padlock.mx-auto(:class="{ unlock: unlocked }")
+                .keyhole
 
-        v-card.mt-4.pa-2(light)
-            v-form.d-flex.align-center(v-model="valid")
-                v-text-field(
-                    label="Admin Password",
-                    prepend-icon="mdi-lock",
-                    type="password",
-                    :rules="[(v) => !!v || 'Required']",
-                    v-model="password"
-                )
-                v-btn.ml-2(
-                    outlined,
-                    color="light-blue",
-                    :loading="loading",
-                    :disabled="!valid",
-                    @click="authenticate"
-                ) Authenticate
+            v-card.mt-4.pa-2(light)
+                v-form.d-flex.align-center(v-model="valid")
+                    v-text-field(
+                        label="Admin Password",
+                        prepend-icon="mdi-lock",
+                        type="password",
+                        :rules="[(v) => !!v || 'Required']",
+                        v-model="password"
+                    )
+                    v-btn.ml-2(
+                        outlined,
+                        color="light-blue",
+                        :loading="loading",
+                        :disabled="!valid",
+                        @click="authenticate"
+                    ) Authenticate
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
-import { State, Mutation, Action } from 'vuex-class'
+import { Vue, Component, Watch } from 'vue-property-decorator'
+import { State, Action } from 'vuex-class'
 import { sendMessage } from '@/sysmsg'
 
 @Component
@@ -33,10 +34,8 @@ export default class extends Vue {
     authenticated!: boolean
     @Action('authenticate')
     _authenticate!: Function
-    @Mutation
-    setAuth!: Function
 
-    value = true
+    value = false
     valid = false
     password = ''
     loading = false
@@ -49,23 +48,35 @@ export default class extends Vue {
 
         if (auth) {
             this.unlocked = true
-            setTimeout(() => {
-                this.setAuth(true)
-            }, 500)
         } else {
             sendMessage('Authentication Failed', { color: 'error' })
         }
     }
 
+    @Watch('authenticated')
+    onAuthChange(n: boolean, o: boolean) {
+        if (o != n) {
+            setTimeout(() => this.value = !n, 500)
+        }
+    }
+
     mounted() {
-        setTimeout(() => {
-            this.unlocked = false
-        }, 500)
+        setTimeout(() => this.value = !this.authenticated, 300)
+        setTimeout(() => this.unlocked = false, 500)
     }
 }
 </script>
 
 <style lang="scss" scoped>
+.overlay-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    z-index: 4;
+}
+
 .padlock {
     position: relative;
     width: 260px;

@@ -1,8 +1,7 @@
 <template lang="pug">
-div(style="height: 100%; width: 100%")
+v-card.pb-12(flat, color="transparent")
     ManageAuth
-
-    .mx-auto(style="width: 600px; position: relative; top: 100px")
+    v-card(flat, color="transparent", style="margin: 100px auto 0 auto")
         .white--text.text-center
             v-avatar(tile, size="100")
                 v-img(
@@ -11,100 +10,245 @@ div(style="height: 100%; width: 100%")
                 )
             span.text-h2 Data Mangager
 
-        v-card(style="margin-top: 80px")
-            v-card-text
-                v-form(v-model="valid" )
-                    v-overflow-btn(
-                        label="Filter",
-                        :items="filters",
-                        v-model="filter"
-                    )
-                    v-expand-transition(group, mode="out-in")
-                        v-text-field(
-                            outlined,
-                            label="URL",
-                            :rules="[v => !!v || 'Required']"
-                            v-model="url",
-                            v-if="filter == 'url'"
-                        )
-                        v-text-field(
-                            outlined,
-                            label="Title Length",
-                            prefix="Longer Than",
-                            type="number",
-                            v-model="length",
-                            v-if="filter == 'title-length'"
-                        )
+        v-container.mt-4.px-12
+            v-row
+                v-col(cols="4")
+                    v-card(ref="filters")
+                        v-card-text
+                            v-form(v-model="valid")
+                                v-label Filter
+                                v-overflow-btn(
+                                    dense,
+                                    label="Filter",
+                                    :items="filters",
+                                    v-model="filter"
+                                )
+                                v-expand-transition
+                                    div(v-if="filter == 'shortened'")
+                                        v-text-field(
+                                            dense,
+                                            outlined,
+                                            label="Key",
+                                            v-model="key"
+                                        )
+                                        v-text-field(
+                                            dense,
+                                            outlined,
+                                            label="Min Click",
+                                            type="number",
+                                            v-model="click"
+                                        )
 
-            v-card-actions
-                v-spacer
-                v-btn.mx-auto(
-                    outlined,
-                    color="primary",
-                    :loading="loading",
-                    :disabled="!valid"
-                    @click="query"
-                ) Query
-                v-spacer
+                                v-expand-transition
+                                    div(v-if="filter == 'brief'")
+                                        v-text-field(
+                                            dense,
+                                            outlined,
+                                            label="URL",
+                                            v-model="url"
+                                        )
+                                        v-text-field(
+                                            dense,
+                                            outlined,
+                                            label="Title",
+                                            v-model="title"
+                                        )
+                                        v-textarea(
+                                            dense,
+                                            outlined,
+                                            label="Summary",
+                                            v-model="summary"
+                                        )
+                                        v-row
+                                            v-col
+                                                v-text-field(
+                                                    dense,
+                                                    outlined,
+                                                    label="Min Title Length",
+                                                    type="number",
+                                                    v-model="min"
+                                                )
+                                            v-col
+                                                v-text-field(
+                                                    dense,
+                                                    outlined,
+                                                    label="Max Title Length",
+                                                    type="number",
+                                                    v-model="max"
+                                                )
+                                v-expand-transition
+                                    v-text-field(
+                                        dense,
+                                        outlined,
+                                        label="IP",
+                                        v-model="ip",
+                                        v-if="filter == 'creator'"
+                                    )
 
-        v-card.mt-4(max-height="600")
-            v-card-text
-                v-data-table(
-                    :headers="headers",
-                    :items="items",
-                    :loading="loading"
-                )
-                    template(#item.actions="{ item }")
-                        v-icon.mr-2(@click="showEditor(item)") mdi-pencil
+                                v-expand-transition
+                                    div(v-if="filter == 'complex'")
+                                        v-label Shortened
+                                        v-row
+                                            v-col
+                                                v-text-field(
+                                                    dense,
+                                                    outlined,
+                                                    label="Key",
+                                                    v-model="key"
+                                                )
+                                            v-col
+                                                v-text-field(
+                                                    dense,
+                                                    outlined,
+                                                    label="Min Click",
+                                                    type="number",
+                                                    v-model="click"
+                                                )
+                                        v-label Brief
+                                        v-row 
+                                            v-col
+                                                v-text-field(
+                                                    dense,
+                                                    outlined,
+                                                    label="URL",
+                                                    v-model="url"
+                                                )
+                                            v-col
+                                                v-text-field(
+                                                    dense,
+                                                    outlined,
+                                                    label="Title",
+                                                    v-model="title"
+                                                )
+                                        v-row
+                                            v-col
+                                                v-textarea(
+                                                    dense,
+                                                    outlined,
+                                                    label="Summary",
+                                                    v-model="summary"
+                                                )
+                                        v-row
+                                            v-col
+                                                v-text-field(
+                                                    dense,
+                                                    outlined,
+                                                    label="Min Title Length",
+                                                    type="number",
+                                                    v-model="min"
+                                                )
+                                            v-col
+                                                v-text-field(
+                                                    dense,
+                                                    outlined,
+                                                    label="Max Title Length",
+                                                    type="number",
+                                                    v-model="max"
+                                                )
+                                        v-label Creator
+                                        v-row
+                                            v-col
+                                                v-text-field(
+                                                    dense,
+                                                    outlined,
+                                                    label="IP",
+                                                    v-model="ip"
+                                                )
+                        v-card-actions
+                            v-spacer
+                            v-btn.mx-auto(
+                                outlined,
+                                color="primary",
+                                :loading="loading",
+                                :disabled="!valid",
+                                @click="query"
+                            ) Query
+                            v-spacer
+                v-col
+                    v-card
+                        v-card-text
+                            v-data-table.rounded(
+                                :height="500",
+                                :headers="headers",
+                                :items="items",
+                                :loading="loading"
+                            )
+                                template(#item.actions="{ item }")
+                                    v-icon.mr-2(@click="showEditor(item)") mdi-pencil
 
-                    template(#item.original="{ item }")
-                        v-tooltip(top)
-                            template(#activator="{ on, attrs }")
-                                a.ellipsis(
-                                    style="max-width: 200px",
-                                    target="_blank",
-                                    :href="item.original.url",
-                                    v-bind="attrs",
-                                    v-on="on"
-                                ) {{ item.original.url }}
+                                template(#item.title="{ item }")
+                                    v-tooltip(top)
+                                        template(#activator="{ on, attrs }")
+                                            .ellipsis(
+                                                style="max-width: 400px",
+                                                v-bind="attrs",
+                                                v-on="on"
+                                            ) {{ item.original.title }}
 
-                            span {{ item.original.url }}
+                                        span {{ item.original.title }}
 
-                    template(#item.creator="{ item }")
-                        td {{ item.creator.IP }}
+                                template(#item.url="{ item }")
+                                    v-tooltip(top)
+                                        template(#activator="{ on, attrs }")
+                                            a.ellipsis(
+                                                style="max-width: 200px",
+                                                target="_blank",
+                                                :href="item.original.url",
+                                                v-bind="attrs",
+                                                v-on="on"
+                                            ) {{ item.original.url }}
 
-            DataEditor(
-                v-model="editor",
-                :item="selected",
-                @update="onItemUpdate",
-                @delete="onItemDelete"
-            )
+                                        span {{ item.original.url }}
+
+                                template(#item.creator="{ item }")
+                                    td {{ item.creator.ip }}
+
+    DataEditor(
+        v-model="editor",
+        :item="selected",
+        @update="onItemUpdate",
+        @delete="onItemDelete"
+    )
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Ref, Watch } from 'vue-property-decorator'
 import DataEditor from '@/components/DataEditor.vue'
 import ManageAuth from '@/components/ManageAuth.vue'
 
 
 @Component({ components: { DataEditor, ManageAuth } })
 export default class extends Vue {
+    @Ref('filters') readonly card!: Vue
+
     filter = 'all'
+
+    key = ''
+    click = 0
+
     url = ''
-    length = 0
+    title = ''
+    summary = ''
+    min = 0
+    max = 100
+
+    ip = ''
+
     valid = false
 
     filters = [
         { text: 'All', value: 'all' },
-        // { text: 'Creator', value: 'creator' },
-        { text: 'URL', value: 'url' },
-        { text: 'Title Length', value: 'title-length' }
+        { text: 'Shortened', value: 'shortened' },
+        { text: 'Brief', value: 'brief' },
+        { text: 'Creator', value: 'creator' },
+        { text: 'Complex', value: 'complex' }
     ]
 
     headers = [
         { text: '', value: 'actions', sortable: false },
         { text: 'Key', value: 'key' },
-        { text: 'Original', value: 'original' },
+        { text: 'Title', value: 'title' },
+        { text: 'URL', value: 'url' },
         { text: 'Creator', value: 'creator' }
     ]
 
@@ -126,18 +270,38 @@ export default class extends Vue {
 
     get queryOptions() {
         let query: any = {}
+        query.filter = this.filter
         switch (this.filter) {
-            case 'url':
-                query.filter = 'url'
-                query.url = this.url
+            case 'shortened':
+                query.key = this.key
+                query.click = this.click
                 break
 
-            case 'title-length':
-                query.filter = 'title-length'
-                query.length = this.length
+            case 'brief':
+                query.url = this.url
+                query.title = this.title
+                query.summary = this.summary
+                query.min = this.min
+                query.max = this.max
+                break
+
+            case 'creator':
+                query.ip = this.ip
+                break
+
+            case 'complex':
+                query.key = this.key
+                query.click = this.click
+                query.url = this.url
+                query.title = this.title
+                query.summary = this.summary
+                query.min = this.min
+                query.max = this.max
+                query.ip = this.ip
                 break
 
             case 'all':
+                delete query.filter
         }
         return query
     }
@@ -152,6 +316,10 @@ export default class extends Vue {
                 this.items = data
                 break
         }
+    }
+
+    requiredRule(v: string) {
+        return !!v || 'Required'
     }
 
     showEditor(item: any) {
@@ -175,7 +343,4 @@ export default class extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.header {
-    margin-bottom: 80px;
-}
 </style>

@@ -1,11 +1,11 @@
 <template lang="pug">
-div(style="height: 100%; width: 100%")
+v-card.pb-12(flat, color="transparent")
     .mx-auto(style="width: 800px")
         .white--text.text-center.mb-12
-            v-avatar.mr-2(tile size="200")
+            v-avatar.mr-2(tile, size="200")
                 v-img(
-                    transition="slide-y-transition"
-                    :src="require('@/assets/web-search-engine.svg')",
+                    transition="slide-y-transition",
+                    :src="require('@/assets/web-search-engine.svg')"
                 )
             span.text-h2 TinyGG
                 .text-h5 Make URLs As Short As Your Cock
@@ -44,8 +44,12 @@ div(style="height: 100%; width: 100%")
                 v-spacer
 
         v-card.mt-2.pa-4
-            DataTable(:items="items", :loading="loading", @update="items = $event")
-    
+            DataTable(
+                :items="items",
+                :loading="loading",
+                @update="items = $event"
+            )
+
     RankTable
 </template>
 
@@ -152,7 +156,5 @@ export default class extends Vue {
     position: absolute;
     top: 50px;
     right: 100px;
-    height: 700px;
-    width: 300px;
 }
 </style>

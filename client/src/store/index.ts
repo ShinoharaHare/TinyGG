@@ -16,11 +16,12 @@ export default new Vuex.Store({
         async checkAuth({ commit, state }) {
             let { data } = await axios.post('/api/token/verify')
             commit('setAuth', data)
-            return state.authenticated 
+            return state.authenticated
         },
-        async authenticate({ commit }, password: string) {
+        async authenticate({ commit, state }, password: string) {
             let { status } = await axios.post('/api/token', { password })
-            return status === 200
+            commit('setAuth', status === 200 )
+            return state.authenticated
         }
     },
     modules: {

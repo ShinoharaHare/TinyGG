@@ -18,12 +18,12 @@ v-dialog(persistent, max-width="600", v-model="value")
             v-text-field(dense, outlined, label="Click", type="number" v-model="temp.click")
             div
                 v-label Original ID
-                a.ml-4(@click="tab = 1") {{ item.original.ID }}
+                a.ml-4(@click="tab = 1") {{ item.original.id }}
                     v-icon.ml-2.mb-1(color="primary") mdi-pencil-outline
 
             .mt-4
                 v-label Creator ID
-                a.ml-4(@click="tab = 2") {{ item.creator.ID }}
+                a.ml-4(@click="tab = 2") {{ item.creator.id }}
                     v-icon.ml-2.mb-1(color="primary") mdi-pencil-outline
 
         v-tab
@@ -32,7 +32,7 @@ v-dialog(persistent, max-width="600", v-model="value")
         v-tab-item.pa-4
             .mb-4
                 v-label ID
-                span.ml-4 {{ item.original.ID }}
+                span.ml-4 {{ item.original.id }}
 
             v-text-field(
                 dense,
@@ -68,7 +68,7 @@ v-dialog(persistent, max-width="600", v-model="value")
                 dense,
                 outlined,
                 label="Thumbnail",
-                v-model="temp.original.cover"
+                v-model="temp.original.thumbnail"
             )
                 template(#prepend)
                     v-tooltip(bottom)
@@ -76,12 +76,11 @@ v-dialog(persistent, max-width="600", v-model="value")
                             v-icon(v-bind="attrs", v-on="on") mdi-eye
 
                         span
-                            v-img(:src="temp.original.cover", max-width="350")
+                            v-img(:src="temp.original.thumbnail", max-width="350")
 
             v-textarea(
                 outlined,
                 label="Summary",
-                height="70",
                 v-model="temp.original.summary"
             )
 
@@ -91,13 +90,13 @@ v-dialog(persistent, max-width="600", v-model="value")
         v-tab-item.pa-4
             .mb-4
                 v-label ID
-                span.ml-4 {{ item.creator.ID }}
+                span.ml-4 {{ item.creator.id }}
 
             v-text-field(
                 dense,
                 outlined,
                 label="IP",
-                v-model="temp.creator.IP"
+                v-model="temp.creator.ip"
             )
 
         v-spacer

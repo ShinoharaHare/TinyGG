@@ -8,7 +8,8 @@ v-data-table.rank-table(
     hide-default-footer,
     :headers="headers",
     :items="items",
-    :loading="loading"
+    :loading="loading",
+    height="790"
 ) 
     template(#top)
         v-toolbar.rounded(flat, color="#1e1e1e")
@@ -60,3 +61,9 @@ export default class extends Vue {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+.rank-table {
+    width: 300px;
+}
+</style>
