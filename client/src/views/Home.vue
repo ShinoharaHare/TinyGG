@@ -8,7 +8,7 @@ v-card.pb-12(flat, color="transparent")
                     :src="require('@/assets/web-search-engine.svg')"
                 )
             span.text-h2 TinyGG
-                .text-h5 Make URLs As Short As Your Cock
+                .text-h5 Make URLs Shorter
 
         v-card.pa-4
             v-form(v-model="valid")
